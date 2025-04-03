@@ -1,5 +1,6 @@
 # import pygame
 import pygame
+import random
 
 # initialization of pygame
 pygame.init()
@@ -8,6 +9,11 @@ pygame.init()
 WIDTH = 1280
 HEIGHT = 720
 PIXEL_SIZE = 4 # size an enlarged pixel
+TREE_WIDTH = 80
+TREE_MIN_HEIGHT = 200
+TREE_MAX_HEIGHT = 620
+TREE_GAP = 235
+TREE_SPEED = 2
 
 # game's variables
 clock = pygame.time.Clock()
@@ -25,6 +31,7 @@ GRAY = (120, 120, 120)
 LIGHT_GRAY = (200, 200, 200)
 SKY_BLUE = (135, 206, 235)
 GREEN_GRASS = (88, 158, 41)
+DARK_GREEN = (51, 92, 36)
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -75,6 +82,30 @@ def draw_cloud(x, y):
 def draw_grass():
     pygame.draw.rect(screen, GREEN_GRASS, (0, HEIGHT - 230, WIDTH, 500))
 
+
+def draw_tree(x, base_y, height):
+    trunk_height = 40 # trunk's height is fixed
+    leafs_height = height # tree's leafs' height is random (determined between TREE_MIN_HEIGHT and TREE_MAX_HEIGHT)
+
+    # tree trunk
+    # x + TREE_WIDTH//3 -> horizontal centered position
+    # base_y - trunk_height -> vertical position, in grass
+    # TREE_WIDTH//3 -> trunk width
+    pygame.draw.rect(screen, BROWN, (x + TREE_WIDTH//3, base_y - trunk_height, TREE_WIDTH//3, trunk_height))
+
+    # tree leafs
+    pygame.draw.polygon(screen, DARK_GREEN, [
+        (x, base_y - trunk_height), # Lower left corner
+        (x + TREE_WIDTH//2, base_y - trunk_height - leafs_height), # top lof the triangle
+        (x + TREE_WIDTH, base_y - trunk_height) # Lower right corner
+    ])  
+
+# WIDTH + i * TREE_GAP -> trees are placed outside the screen and appears progressively
+# HEIGHT -> they're placed on the grass
+# random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT) -> height of leafs is random 
+trees = [(WIDTH + i * TREE_GAP, HEIGHT, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT)) for i in range(6)]
+
+
 while running:
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
@@ -88,6 +119,20 @@ while running:
     draw_cloud(630, 380)
     draw_cloud(850, 320)
     draw_cloud(950, 105)
+
+    # trees on screen (display + movement)
+    for i in range(len(trees)):
+        # move trees to left
+        # the tree's X (horizontal) position decreases every TREE_SPEED pixels per image
+        trees[i] = (trees[i][0] - TREE_SPEED, trees[i][1], trees[i][2])
+
+        # Every tree is re-drawn at its new position
+        draw_tree(trees[i][0], trees[i][1], trees[i][2])
+
+        # if the tree is totally out of the screen on the left, it's then repositionned à the right (WIDTH)
+        # and its height is randomly reset
+        if trees[i][0] < -TREE_WIDTH:
+            trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
 
     # Bird on screen
     screen.blit(bird_img, (bird.x, bird.y))
