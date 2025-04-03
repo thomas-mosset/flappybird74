@@ -14,6 +14,9 @@ TREE_MIN_HEIGHT = 200
 TREE_MAX_HEIGHT = 620
 TREE_GAP = 235
 TREE_SPEED = 2
+GRAVITY = 1 # makes the bird fall down
+JUMP_STRENGTH = -12 # bird's jump strenght
+BIRD_VERTICAL_SPEED = 0
 
 # game's variables
 clock = pygame.time.Clock()
@@ -134,14 +137,38 @@ while running:
         if trees[i][0] < -TREE_WIDTH:
             trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
 
-    # Bird on screen
-    screen.blit(bird_img, (bird.x, bird.y))
-
     # events management
     for event in pygame.event.get():
         # pygame .QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
+
+        # if a key from the keyboard is pressed
+        if event.type == pygame.KEYDOWN:
+            # if the key is equal to the space key or the up key
+            if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                # the bird jumps
+                BIRD_VERTICAL_SPEED = JUMP_STRENGTH
+
+
+    # gravity is applied to the bird
+    BIRD_VERTICAL_SPEED += GRAVITY
+    # update the bird's position
+    bird.y += BIRD_VERTICAL_SPEED
+
+    # Limit the bird's position...
+    # ... to the bottom
+    if bird.y < 0:
+        bird.y = 0
+        BIRD_VERTICAL_SPEED = 0
+    
+    # ... to the top
+    if bird.y > HEIGHT - 50 - bird.height:
+        bird.y > HEIGHT - 50 - bird.height
+        BIRD_VERTICAL_SPEED = 0
+
+    # Bird on screen
+    screen.blit(bird_img, (bird.x, bird.y))
 
     # refresh the screen
     pygame.display.flip()
