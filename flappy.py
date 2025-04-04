@@ -1,6 +1,7 @@
 # import pygame
 import pygame
 import random
+import time
 
 # initialization of pygame
 pygame.init()
@@ -38,6 +39,7 @@ running = True
 bubbles = []
 bubble_timer = 0 # to calculate the spawn time of a bubble
 score = 0
+game_started = False  # New variable for countdown
 
 # game's colors (RGB)
 WHITE = (255, 255, 255)
@@ -181,6 +183,30 @@ def point_in_triangle(px, py, ax, ay, bx, by, cx, cy):
     beta = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / detT
     gamma = 1 - alpha - beta
     return (0 <= alpha <= 1) and (0 <= beta <= 1) and (0 <= gamma <= 1)
+
+
+def countdown():
+    global game_started
+    font = pygame.font.Font(None, 100)
+    
+    for i in range(3, 0, -1):
+        screen.fill(SKY_BLUE)
+        text = font.render(str(i), True, BLACK)
+        screen.blit(text, (WIDTH // 2 - 30, HEIGHT // 2 - 50))
+        pygame.display.flip()
+        time.sleep(1) # wait 1 sec between each number display
+    
+    # Display "GO!"
+    screen.fill(SKY_BLUE)
+    text = font.render("GO!", True, BLACK)
+    screen.blit(text, (WIDTH // 2 - 80, HEIGHT // 2 - 50))
+    pygame.display.flip()
+    time.sleep(1) # wait 1 sec before displaying "GO!"
+
+    game_started = True  # Start the game after countdown
+
+# Start countdown before entering main loop
+countdown()
 
 
 # main loop
