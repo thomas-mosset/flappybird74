@@ -26,6 +26,7 @@ running = True
 
 bubbles = []
 bubble_timer = 0 # to calculate the spawn time of a bubble
+score = 0
 
 # game's colors (RGB)
 WHITE = (255, 255, 255)
@@ -77,6 +78,7 @@ class Bubble:
         self.radius = 25 # initial size of the bubble
         self.value = random.randint(1, 5) # random points value between 1 and 5
         self.active = True # to deal with its deleting
+        self.alpha = 255  # Fully opaque
 
     def move(self):
         # move the bubble from the right to the left
@@ -87,11 +89,33 @@ class Bubble:
     def draw(self, screen):
         # display the bubble on screen
         if self.active:
-            pygame.draw.circle(screen, (BUBBLE_COLOR), (self.x, self.y), self.radius)
+            bubble_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
+            pygame.draw.circle(bubble_surface, (BUBBLE_COLOR[0], BUBBLE_COLOR[1], BUBBLE_COLOR[2], self.alpha),(self.radius, self.radius), self.radius)
+            screen.blit(bubble_surface, (self.x - self.radius, self.y - self.radius))
             font = pygame.font.Font(None, 30)
             text = font.render(str(self.value), True, (BLACK))
+            text.set_alpha(self.alpha)  # Apply transparency to text
             screen.blit(text, (self.x -5, self.y - 9)) # center the text withing the bubble
 
+    def shrink(self):
+        """Fade-out effect before disappearing."""
+        if self.alpha > 0:
+            self.alpha -= 15  # Reduce transparency
+            self.radius -= 1
+        else:
+            self.active = False  # Remove when fully transparent
+
+# check if the bird touches a bubble
+def check_bubble_collision():
+    global score
+    for bubble in bubbles:
+        if bubble.active:
+            distance = ((bird.x - bubble.x) ** 2 + (bird.y - bubble.y) ** 2) ** 0.5
+            # collision detected
+            if distance < bubble.radius + 20: 
+                score += bubble.value
+                bubble.value = 0  # Remove points from the bubble
+                bubble.shrink()  # Start fading effect
 
 
 def draw_mountains():
@@ -219,15 +243,22 @@ while running:
         bubbles.append(Bubble()) # create a new bubble
         bubble_timer = 0 # reset the bubble timer
 
-    # TODO check fo collision with bubbles
+    # check fo collision with bubbles
+    check_bubble_collision()
 
     # Display and update bubbles
     for bubble in bubbles:
         if bubble.active:
-            bubble.move() # move the bubble
+            bubble.move()
             bubble.draw(screen)
         else:
             bubbles.remove(bubble) # Remove inactive bubbles
+
+
+    # Display score
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, BLACK)
+    screen.blit(score_text, (20, 20))
 
 
     # Bird on screen
