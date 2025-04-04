@@ -108,6 +108,12 @@ def draw_tree(x, base_y, height):
 # random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT) -> height of leafs is random 
 trees = [(WIDTH + i * TREE_GAP, HEIGHT, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT)) for i in range(6)]
 
+def point_in_triangle(px, py, ax, ay, bx, by, cx, cy):
+    detT = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
+    alpha = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / detT
+    beta = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / detT
+    gamma = 1 - alpha - beta
+    return (0 <= alpha <= 1) and (0 <= beta <= 1) and (0 <= gamma <= 1)
 
 while running:
     # fill the screen with a color
@@ -136,6 +142,24 @@ while running:
         # and its height is randomly reset
         if trees[i][0] < -TREE_WIDTH:
             trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
+         
+        # definition of rectangles collision for the trees
+        trunk_rect_collision = pygame.Rect(trees[i][0] + TREE_WIDTH//3, trees[i][1] - 40, TREE_WIDTH//3, 40)
+
+        # check if collision between the bird and the tree's trunk
+        if bird.colliderect(trunk_rect_collision) :
+            running = False # stop the game
+
+
+        # Collision detection with leaves
+        ax, ay = trees[i][0], trees[i][1] - 40
+        bx, by = trees[i][0] + TREE_WIDTH//2, trees[i][1] - 40 - trees[i][2]
+        cx, cy = trees[i][0] + TREE_WIDTH, trees[i][1] - 40
+
+        for corner in [(bird.x, bird.y), (bird.x + bird.width, bird.y),
+                       (bird.x, bird.y + bird.height), (bird.x + bird.width, bird.y + bird.height)]:
+            if point_in_triangle(corner[0], corner[1], ax, ay, bx, by, cx, cy):
+                running = False  # Collision with leaves
 
     # events management
     for event in pygame.event.get():
@@ -149,7 +173,6 @@ while running:
             if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                 # the bird jumps
                 BIRD_VERTICAL_SPEED = JUMP_STRENGTH
-
 
     # gravity is applied to the bird
     BIRD_VERTICAL_SPEED += GRAVITY
