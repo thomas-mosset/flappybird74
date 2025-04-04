@@ -278,6 +278,9 @@ while running:
                 # the bird jumps
                 BIRD_VERTICAL_SPEED = JUMP_STRENGTH
 
+        # if bird is out of the bottom of the screen, reload the game (player has lost)
+        if bird.y + bird.height >= HEIGHT:
+            running = False # stop the game
 
     # refresh the screen
     pygame.display.flip()
