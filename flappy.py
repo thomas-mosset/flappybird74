@@ -5,6 +5,17 @@ import random
 # initialization of pygame
 pygame.init()
 
+# initialization of the timer (in milliseconds)
+start_time = pygame.time.get_ticks()
+
+# game's images / icons
+timer_img = pygame.image.load("icon/timer.png")
+timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
+
+trophy_img = pygame.image.load("icon/trophy.png")
+trophy_img = pygame.transform.scale(trophy_img, (30, 30))
+
+
 # game's constants
 WIDTH = 1280
 HEIGHT = 720
@@ -171,6 +182,8 @@ def point_in_triangle(px, py, ax, ay, bx, by, cx, cy):
     gamma = 1 - alpha - beta
     return (0 <= alpha <= 1) and (0 <= beta <= 1) and (0 <= gamma <= 1)
 
+
+# main loop
 while running:
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
@@ -255,10 +268,22 @@ while running:
             bubbles.remove(bubble) # Remove inactive bubbles
 
 
-    # Display score
+    # Info displayed on screen (timer + score)
     font = pygame.font.Font(None, 36)
+
+    # Timer
+    # Calculate timer
+    elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
+
+    # Display timer
+    timer_text = font.render(f"Time: {elapsed_time}s", True, BLACK)
+    screen.blit(timer_text, (55, 19)) # Position at the top
+    screen.blit(timer_img, (20, 15))
+
+    # Display score
     score_text = font.render(f"Score: {score}", True, BLACK)
-    screen.blit(score_text, (20, 20))
+    screen.blit(score_text, (55, 55)) # Position at the top but slightly lower than the timer
+    screen.blit(trophy_img, (20, 50))
 
 
     # Bird on screen
