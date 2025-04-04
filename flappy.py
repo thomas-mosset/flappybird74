@@ -17,10 +17,15 @@ TREE_SPEED = 2
 GRAVITY = 1 # makes the bird fall down
 JUMP_STRENGTH = -12 # bird's jump strenght
 BIRD_VERTICAL_SPEED = 0
+BUBBLE_SPAWN_TIME = 180 # a bubble every 3 sec (60 FPS * 3)
+BUBBLE_SPEED = 2 # speed of moving bubbles
 
 # game's variables
 clock = pygame.time.Clock()
 running = True
+
+bubbles = []
+bubble_timer = 0 # to calculate the spawn time of a bubble
 
 # game's colors (RGB)
 WHITE = (255, 255, 255)
@@ -35,6 +40,7 @@ LIGHT_GRAY = (200, 200, 200)
 SKY_BLUE = (135, 206, 235)
 GREEN_GRASS = (88, 158, 41)
 DARK_GREEN = (51, 92, 36)
+BUBBLE_COLOR = (248, 191, 23)
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -61,6 +67,32 @@ def create_pixel_bird():
 
 bird_img = create_pixel_bird()
 bird = pygame.Rect(100, 200, 48, 48)
+
+
+class Bubble:
+    # create a unique bubble with a random posiiotn and a random value
+    def __init__(self):
+        self.x = WIDTH + random.randint(50, 200)  # Spawn off-screen
+        self.y = random.randint(100, HEIGHT - 200)
+        self.radius = 25 # initial size of the bubble
+        self.value = random.randint(1, 5) # random points value between 1 and 5
+        self.active = True # to deal with its deleting
+
+    def move(self):
+        # move the bubble from the right to the left
+        self.x -= BUBBLE_SPEED
+        if self.x < -self.radius: # Remove the bubble if it goes off-screen
+            self.active = False
+    
+    def draw(self, screen):
+        # display the bubble on screen
+        if self.active:
+            pygame.draw.circle(screen, (BUBBLE_COLOR), (self.x, self.y), self.radius)
+            font = pygame.font.Font(None, 30)
+            text = font.render(str(self.value), True, (BLACK))
+            screen.blit(text, (self.x -5, self.y - 9)) # center the text withing the bubble
+
+
 
 def draw_mountains():
     # draw.polygon allows to draw triangles
@@ -129,6 +161,24 @@ while running:
     draw_cloud(850, 320)
     draw_cloud(950, 105)
 
+
+    # gravity is applied to the bird
+    BIRD_VERTICAL_SPEED += GRAVITY
+    # update the bird's position
+    bird.y += BIRD_VERTICAL_SPEED
+
+    # Limit the bird's position...
+    # ... to the bottom
+    if bird.y < 0:
+        bird.y = 0
+        BIRD_VERTICAL_SPEED = 0
+    
+    # ... to the top
+    if bird.y > HEIGHT - 50 - bird.height:
+        bird.y > HEIGHT - 50 - bird.height
+        BIRD_VERTICAL_SPEED = 0
+
+
     # trees on screen (display + movement)
     for i in range(len(trees)):
         # move trees to left
@@ -161,6 +211,29 @@ while running:
             if point_in_triangle(corner[0], corner[1], ax, ay, bx, by, cx, cy):
                 running = False  # Collision with leaves
 
+
+
+    # bubbles spawn management
+    bubble_timer += 1
+    if bubble_timer >= BUBBLE_SPAWN_TIME:
+        bubbles.append(Bubble()) # create a new bubble
+        bubble_timer = 0 # reset the bubble timer
+
+    # TODO check fo collision with bubbles
+
+    # Display and update bubbles
+    for bubble in bubbles:
+        if bubble.active:
+            bubble.move() # move the bubble
+            bubble.draw(screen)
+        else:
+            bubbles.remove(bubble) # Remove inactive bubbles
+
+
+    # Bird on screen
+    screen.blit(bird_img, (bird.x, bird.y))
+
+
     # events management
     for event in pygame.event.get():
         # pygame .QUIT event means the user clicked X to close your window
@@ -174,24 +247,6 @@ while running:
                 # the bird jumps
                 BIRD_VERTICAL_SPEED = JUMP_STRENGTH
 
-    # gravity is applied to the bird
-    BIRD_VERTICAL_SPEED += GRAVITY
-    # update the bird's position
-    bird.y += BIRD_VERTICAL_SPEED
-
-    # Limit the bird's position...
-    # ... to the bottom
-    if bird.y < 0:
-        bird.y = 0
-        BIRD_VERTICAL_SPEED = 0
-    
-    # ... to the top
-    if bird.y > HEIGHT - 50 - bird.height:
-        bird.y > HEIGHT - 50 - bird.height
-        BIRD_VERTICAL_SPEED = 0
-
-    # Bird on screen
-    screen.blit(bird_img, (bird.x, bird.y))
 
     # refresh the screen
     pygame.display.flip()
