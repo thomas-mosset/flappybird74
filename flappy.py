@@ -208,7 +208,6 @@ def countdown():
 # Start countdown before entering main loop
 countdown()
 
-
 # main loop
 while running:
     # fill the screen with a color
@@ -337,5 +336,24 @@ while running:
     pygame.display.flip()
     # limits FPS to 60
     clock.tick(60)
+
+
+# Ending screen
+eding_font_big = pygame.font.Font(None, 100)
+eding_font_small = pygame.font.Font(None, 50)
+
+screen.fill((0, 0, 0)) # black background
+game_over_text = eding_font_big.render("GAME OVER", True, (255, 0, 0))
+score_text = eding_font_small.render(f"Score: {score}", True, (255, 255, 255))
+time_text = eding_font_small.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
+
+screen.blit(game_over_text, (WIDTH // 2 - 200, HEIGHT // 2 - 100))
+screen.blit(score_text, (WIDTH // 2 - 100, HEIGHT // 2))
+screen.blit(time_text, (WIDTH // 2 - 100, HEIGHT // 2 + 60))
+
+pygame.display.flip()
+
+# Wait 3 secondes before closing
+time.sleep(3)
 
 pygame.quit()
