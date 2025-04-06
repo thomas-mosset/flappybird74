@@ -40,6 +40,7 @@ bubbles = []
 bubble_timer = 0 # to calculate the spawn time of a bubble
 score = 0
 game_started = False  # New variable for countdown
+game_paused = False
 
 # game's colors (RGB)
 WHITE = (255, 255, 255)
@@ -223,98 +224,6 @@ while running:
     draw_cloud(850, 320)
     draw_cloud(950, 105)
 
-
-    # gravity is applied to the bird
-    BIRD_VERTICAL_SPEED += GRAVITY
-    # update the bird's position
-    bird.y += BIRD_VERTICAL_SPEED
-
-    # Limit the bird's position...
-    # ... to the bottom
-    if bird.y < 0:
-        bird.y = 0
-        BIRD_VERTICAL_SPEED = 0
-    
-    # ... to the top
-    if bird.y > HEIGHT - 50 - bird.height:
-        bird.y > HEIGHT - 50 - bird.height
-        BIRD_VERTICAL_SPEED = 0
-
-
-    # trees on screen (display + movement)
-    for i in range(len(trees)):
-        # move trees to left
-        # the tree's X (horizontal) position decreases every TREE_SPEED pixels per image
-        trees[i] = (trees[i][0] - TREE_SPEED, trees[i][1], trees[i][2])
-
-        # Every tree is re-drawn at its new position
-        draw_tree(trees[i][0], trees[i][1], trees[i][2])
-
-        # if the tree is totally out of the screen on the left, it's then repositionned à the right (WIDTH)
-        # and its height is randomly reset
-        if trees[i][0] < -TREE_WIDTH:
-            trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
-         
-        # definition of rectangles collision for the trees
-        trunk_rect_collision = pygame.Rect(trees[i][0] + TREE_WIDTH//3, trees[i][1] - 40, TREE_WIDTH//3, 40)
-
-        # check if collision between the bird and the tree's trunk
-        if bird.colliderect(trunk_rect_collision) :
-            running = False # stop the game
-
-
-        # Collision detection with leaves
-        ax, ay = trees[i][0], trees[i][1] - 40
-        bx, by = trees[i][0] + TREE_WIDTH//2, trees[i][1] - 40 - trees[i][2]
-        cx, cy = trees[i][0] + TREE_WIDTH, trees[i][1] - 40
-
-        for corner in [(bird.x, bird.y), (bird.x + bird.width, bird.y),
-                       (bird.x, bird.y + bird.height), (bird.x + bird.width, bird.y + bird.height)]:
-            if point_in_triangle(corner[0], corner[1], ax, ay, bx, by, cx, cy):
-                running = False  # Collision with leaves
-
-
-
-    # bubbles spawn management
-    bubble_timer += 1
-    if bubble_timer >= BUBBLE_SPAWN_TIME:
-        bubbles.append(Bubble()) # create a new bubble
-        bubble_timer = 0 # reset the bubble timer
-
-    # check fo collision with bubbles
-    check_bubble_collision()
-
-    # Display and update bubbles
-    for bubble in bubbles:
-        if bubble.active:
-            bubble.move()
-            bubble.draw(screen)
-        else:
-            bubbles.remove(bubble) # Remove inactive bubbles
-
-
-    # Info displayed on screen (timer + score)
-    font = pygame.font.Font(None, 36)
-
-    # Timer
-    # Calculate timer
-    elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
-
-    # Display timer
-    timer_text = font.render(f"Time: {elapsed_time}s", True, BLACK)
-    screen.blit(timer_text, (55, 19)) # Position at the top
-    screen.blit(timer_img, (20, 15))
-
-    # Display score
-    score_text = font.render(f"Score: {score}", True, BLACK)
-    screen.blit(score_text, (55, 55)) # Position at the top but slightly lower than the timer
-    screen.blit(trophy_img, (20, 50))
-
-
-    # Bird on screen
-    screen.blit(bird_img, (bird.x, bird.y))
-
-
     # events management
     for event in pygame.event.get():
         # pygame .QUIT event means the user clicked X to close your window
@@ -323,14 +232,122 @@ while running:
 
         # if a key from the keyboard is pressed
         if event.type == pygame.KEYDOWN:
+
             # if the key is equal to the space key or the up key
             if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                 # the bird jumps
                 BIRD_VERTICAL_SPEED = JUMP_STRENGTH
 
+            # if ESC key is pressed then we pause the game
+            if event.key == pygame.K_ESCAPE:
+                game_paused = not game_paused
+
+
         # if bird is out of the bottom of the screen, reload the game (player has lost)
         if bird.y + bird.height >= HEIGHT:
             running = False # stop the game
+
+
+
+    if not game_paused:
+        # gravity is applied to the bird
+        BIRD_VERTICAL_SPEED += GRAVITY
+        # update the bird's position
+        bird.y += BIRD_VERTICAL_SPEED
+
+        # Limit the bird's position...
+        # ... to the bottom
+        if bird.y < 0:
+            bird.y = 0
+            BIRD_VERTICAL_SPEED = 0
+        
+        # ... to the top
+        if bird.y > HEIGHT - 50 - bird.height:
+            bird.y > HEIGHT - 50 - bird.height
+            BIRD_VERTICAL_SPEED = 0
+
+
+        # trees on screen (display + movement)
+        for i in range(len(trees)):
+            # move trees to left
+            # the tree's X (horizontal) position decreases every TREE_SPEED pixels per image
+            trees[i] = (trees[i][0] - TREE_SPEED, trees[i][1], trees[i][2])
+
+            # Every tree is re-drawn at its new position
+            draw_tree(trees[i][0], trees[i][1], trees[i][2])
+
+            # if the tree is totally out of the screen on the left, it's then repositionned à the right (WIDTH)
+            # and its height is randomly reset
+            if trees[i][0] < -TREE_WIDTH:
+                trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
+            
+            # definition of rectangles collision for the trees
+            trunk_rect_collision = pygame.Rect(trees[i][0] + TREE_WIDTH//3, trees[i][1] - 40, TREE_WIDTH//3, 40)
+
+            # check if collision between the bird and the tree's trunk
+            if bird.colliderect(trunk_rect_collision) :
+                running = False # stop the game
+
+
+            # Collision detection with leaves
+            ax, ay = trees[i][0], trees[i][1] - 40
+            bx, by = trees[i][0] + TREE_WIDTH//2, trees[i][1] - 40 - trees[i][2]
+            cx, cy = trees[i][0] + TREE_WIDTH, trees[i][1] - 40
+
+            for corner in [(bird.x, bird.y), (bird.x + bird.width, bird.y),
+                        (bird.x, bird.y + bird.height), (bird.x + bird.width, bird.y + bird.height)]:
+                if point_in_triangle(corner[0], corner[1], ax, ay, bx, by, cx, cy):
+                    running = False  # Collision with leaves
+
+
+
+        # bubbles spawn management
+        bubble_timer += 1
+        if bubble_timer >= BUBBLE_SPAWN_TIME:
+            bubbles.append(Bubble()) # create a new bubble
+            bubble_timer = 0 # reset the bubble timer
+
+        # check fo collision with bubbles
+        check_bubble_collision()
+
+        # Display and update bubbles
+        for bubble in bubbles:
+            if bubble.active:
+                bubble.move()
+                bubble.draw(screen)
+            else:
+                bubbles.remove(bubble) # Remove inactive bubbles
+
+
+        # Info displayed on screen (timer + score)
+        font = pygame.font.Font(None, 36)
+
+        # Timer
+        # Calculate timer
+        elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
+
+        # Display timer
+        timer_text = font.render(f"Time: {elapsed_time}s", True, BLACK)
+        screen.blit(timer_text, (55, 19)) # Position at the top
+        screen.blit(timer_img, (20, 15))
+
+        # Display score
+        score_text = font.render(f"Score: {score}", True, BLACK)
+        screen.blit(score_text, (55, 55)) # Position at the top but slightly lower than the timer
+        screen.blit(trophy_img, (20, 50))
+
+
+        # Bird on screen
+        screen.blit(bird_img, (bird.x, bird.y))
+
+
+       
+    # if game is paused / Pause screen
+    if game_paused:
+        game_paused_font = pygame.font.Font(None, 80)
+        game_paused_text = game_paused_font.render("PAUSE", True, (255, 0, 0))
+        screen.blit(game_paused_text, (WIDTH // 2 - 100, HEIGHT // 2 - 40))
+
 
     # refresh the screen
     pygame.display.flip()
