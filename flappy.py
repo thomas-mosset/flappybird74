@@ -6,6 +6,15 @@ import time
 # initialization of pygame
 pygame.init()
 
+# musics
+pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
+pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
+pygame.mixer.music.play(-1) # -1 = infinite loop
+
+# sounds
+game_over_sound = pygame.mixer.Sound("assets/sounds/game_over.mp3")
+game_over_sound.set_volume(0.5)
+
 # initialization of the timer (in milliseconds)
 start_time = pygame.time.get_ticks()
 
@@ -241,6 +250,12 @@ while running:
             # if ESC key is pressed then we pause the game
             if event.key == pygame.K_ESCAPE:
                 game_paused = not game_paused
+                
+                # music on pause
+                if game_paused:
+                    pygame.mixer.music.pause()
+                else:
+                    pygame.mixer.music.unpause()
 
 
         # if bird is out of the bottom of the screen, reload the game (player has lost)
@@ -356,6 +371,10 @@ while running:
 
 
 # Ending screen
+
+pygame.mixer.music.stop() # stop the game's music loop
+game_over_sound.play() # play the game over sound
+
 eding_font_big = pygame.font.Font(None, 100)
 eding_font_small = pygame.font.Font(None, 50)
 
