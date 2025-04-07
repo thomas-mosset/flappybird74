@@ -19,10 +19,10 @@ game_over_sound.set_volume(0.5)
 start_time = pygame.time.get_ticks()
 
 # game's images / icons
-timer_img = pygame.image.load("icon/timer.png")
+timer_img = pygame.image.load("assets/icons/timer.png")
 timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
 
-trophy_img = pygame.image.load("icon/trophy.png")
+trophy_img = pygame.image.load("assets/icons/trophy.png")
 trophy_img = pygame.transform.scale(trophy_img, (30, 30))
 
 
