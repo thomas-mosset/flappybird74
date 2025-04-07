@@ -15,6 +15,9 @@ pygame.mixer.music.play(-1) # -1 = infinite loop
 game_over_sound = pygame.mixer.Sound("assets/sounds/game_over.mp3")
 game_over_sound.set_volume(0.5)
 
+bubble_touched_sound = pygame.mixer.Sound("assets/sounds/bubble_touched.mp3")
+bubble_touched_sound.set_volume(0.2)
+
 # initialization of the timer (in milliseconds)
 start_time = pygame.time.get_ticks()
 
@@ -139,6 +142,7 @@ def check_bubble_collision():
                 score += bubble.value
                 bubble.value = 0  # Remove points from the bubble
                 bubble.shrink()  # Start fading effect
+                bubble_touched_sound.play()
 
 
 def draw_mountains():
