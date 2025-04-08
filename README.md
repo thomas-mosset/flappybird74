@@ -20,6 +20,10 @@ Le jeu reprend le concept de Flappy bird. Ici les tuyaux sont remplacés par des
 - Musique : [POL-magical-sun-short de Filippo Vicarelli](https://www.filippovicarelli.com/8bit-game-background-music)
 - Sons : [Soundsnap](https://www.soundsnap.com/)
 
+## Démo
+
+[![Démo du jeu](https://markdown-videos-api.jorgenkh.no/youtube/B4nhvpC_mMQ)](https://youtu.be/B4nhvpC_mMQ)
+
 ## Lancer le jeu
 
 Cloner le repo, puis lancer les commandes suivantes :
