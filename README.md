@@ -19,6 +19,7 @@ Le jeu reprend le concept de Flappy bird. Ici les tuyaux sont remplacés par des
 - Images et décors (personnage, arbres, nuages, bulle de points, etc.) : Pygame
 - Musique : [POL-magical-sun-short de Filippo Vicarelli](https://www.filippovicarelli.com/8bit-game-background-music)
 - Sons : [Soundsnap](https://www.soundsnap.com/)
+- Font : Press Start 2P de CodeMan38
 
 ## Démo
 
