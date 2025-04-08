@@ -76,6 +76,7 @@ trophy_img = pygame.transform.scale(trophy_img, (30, 30))
 
 grass_img = pygame.image.load("assets/background_elements/grass.bmp")
 mountain_img = pygame.image.load("assets/background_elements/mountain.bmp")
+cloud_img = pygame.image.load("assets/background_elements/cloud.bmp")
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -139,6 +140,28 @@ class Bubble:
         else:
             self.active = False  # Remove when fully transparent
 
+
+class Cloud:
+    def __init__(self):
+        self.image = cloud_img
+        self.x = WIDTH + random.randint(0, 400) # cloud starts outisde the right screen, at a random position
+        self.y = random.randint(5, 80) # cloud is random height level
+        self.speed = random.uniform(0.5, 1.5) # each cloud will have a random speed
+        self.scale = random.uniform(0.2, 0.9) # each cloud will have a different size
+        self.image = pygame.transform.scale(cloud_img, ( # resize the cloud while keeping its scale
+            int(cloud_img.get_width() * self.scale),
+            int(cloud_img.get_height() * self.scale)
+        ))
+    
+    def move(self):
+        self.x -= self.speed # diminish the x cloud's position based on its speed, so it's moving to the left
+        if self.x < -self.image.get_width(): # if it's completely outside the left screen...
+            self.x = WIDTH + random.randint(100, 500) # ... we put it back outside the right screen
+            self.y = random.randint(5, 80) # ... and we give it a new random height
+    
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+
 # check if the bird touches a bubble
 def check_bubble_collision():
     global score
@@ -156,18 +179,6 @@ def check_bubble_collision():
 def draw_mountains():
     screen.blit(mountain_img, (0, HEIGHT - mountain_img.get_height()))
 
-def draw_cloud(x, y):
-    cloud_pixels = [
-        (3, 0), (4, 0), (5, 0), (6, 0),
-        (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1),
-        (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (8, 2),
-        (2, 3), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3),
-        (3, 4), (4, 4), (5, 4), (6, 4),
-    ]
-
-    for px, py in cloud_pixels:
-        pygame.draw.rect(screen, WHITE, ((x + px * (PIXEL_SIZE * 2.5), y + py * (PIXEL_SIZE * 2.5), (PIXEL_SIZE * 2.5), (PIXEL_SIZE * 2.5))))
-    
 
 def draw_grass():
     screen.blit(grass_img, (0, HEIGHT - grass_img.get_height()))
@@ -227,20 +238,19 @@ def countdown():
 # Start countdown before entering main loop
 countdown()
 
+# Create the clouds
+clouds = [Cloud() for _ in range(4)]
+
 # main loop
 while running:
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
-    draw_mountains() # mountains
-    draw_grass() # grass / ground
-    # different clouds -> draw_cloud(X axis, Y axis)
-    draw_cloud(20, 80)
-    draw_cloud(360, 200)
-    draw_cloud(500, 100)
-    draw_cloud(200, 180)
-    draw_cloud(630, 380)
-    draw_cloud(850, 320)
-    draw_cloud(950, 105)
+    draw_mountains()
+    draw_grass()
+
+    for cloud in clouds:
+        cloud.move()
+        cloud.draw(screen)
 
     # events management
     for event in pygame.event.get():
