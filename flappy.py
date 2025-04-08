@@ -21,8 +21,8 @@ pygame.mixer.music.play(-1) # -1 = infinite loop
 game_over_sound = pygame.mixer.Sound("assets/sounds/game_over.mp3")
 game_over_sound.set_volume(0.5)
 
-bubble_touched_sound = pygame.mixer.Sound("assets/sounds/bubble_touched.mp3")
-bubble_touched_sound.set_volume(0.2)
+coin_touched_sound = pygame.mixer.Sound("assets/sounds/coin_touched.mp3")
+coin_touched_sound.set_volume(0.2)
 
 # initialization of the timer (in milliseconds)
 start_time = pygame.time.get_ticks()
@@ -39,15 +39,15 @@ TREE_SPEED = 2
 GRAVITY = 1 # makes the bird fall down
 JUMP_STRENGTH = -12 # bird's jump strenght
 BIRD_VERTICAL_SPEED = 0
-BUBBLE_SPAWN_TIME = 180 # a bubble every 3 sec (60 FPS * 3)
-BUBBLE_SPEED = 2 # speed of moving bubbles
+COIN_SPAWN_TIME = 180 # a coin every 3 sec (60 FPS * 3)
+COIN_SPEED = 2 # speed of moving coins
 
 # game's variables
 clock = pygame.time.Clock()
 running = True
 
-bubbles = []
-bubble_timer = 0 # to calculate the spawn time of a bubble
+coins = []
+coin_timer = 0 # to calculate the spawn time of a coin
 score = 0
 game_started = False  # New variable for countdown
 game_paused = False
@@ -65,7 +65,7 @@ LIGHT_GRAY = (200, 200, 200)
 SKY_BLUE = (135, 206, 235)
 GREEN_GRASS = (88, 158, 41)
 DARK_GREEN = (51, 92, 36)
-BUBBLE_COLOR = (248, 191, 23)
+coin_COLOR = (248, 191, 23)
 
 # game's images / icons
 timer_img = pygame.image.load("assets/icons/timer.png")
@@ -77,6 +77,12 @@ trophy_img = pygame.transform.scale(trophy_img, (30, 30))
 grass_img = pygame.image.load("assets/background_elements/grass.bmp")
 mountain_img = pygame.image.load("assets/background_elements/mountain.bmp")
 cloud_img = pygame.image.load("assets/background_elements/cloud.bmp")
+
+blue_coin_1_img = pygame.image.load("assets/icons/1-coin-blue.bmp")
+yellow_coin_2_img = pygame.image.load("assets/icons/2-coin-yellow.bmp")
+orange_coin_3_img = pygame.image.load("assets/icons/3-coin-orange.bmp")
+pink_coin_4_img = pygame.image.load("assets/icons/4-coin-pink.bmp")
+star_coin_5_img = pygame.image.load("assets/icons/5-coin-star.bmp")
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -105,32 +111,40 @@ bird_img = create_pixel_bird()
 bird = pygame.Rect(100, 200, 48, 48)
 
 
-class Bubble:
-    # create a unique bubble with a random posiiotn and a random value
+class Coin:
+    # create a unique coin with a random posiiotn and a random value
     def __init__(self):
         self.x = WIDTH + random.randint(50, 200)  # Spawn off-screen
         self.y = random.randint(100, HEIGHT - 200)
-        self.radius = 25 # initial size of the bubble
+        self.radius = 25 # initial size of the coin
         self.value = random.randint(1, 5) # random points value between 1 and 5
         self.active = True # to deal with its deleting
-        self.alpha = 255  # Fully opaque
+        self.alpha = 255  # Fully 
+        
+        # assign values to icons
+        self.image = {
+            1: blue_coin_1_img,
+            2: yellow_coin_2_img,
+            3: orange_coin_3_img,
+            4: pink_coin_4_img,
+            5: star_coin_5_img
+        }[self.value]
+
+        # Resize the coin
+        self.image = pygame.transform.scale(self.image, (40, 40))
 
     def move(self):
-        # move the bubble from the right to the left
-        self.x -= BUBBLE_SPEED
-        if self.x < -self.radius: # Remove the bubble if it goes off-screen
+        # move the coin from the right to the left
+        self.x -= COIN_SPEED
+        if self.x < -self.radius: # Remove the coin if it goes off-screen
             self.active = False
     
     def draw(self, screen):
-        # display the bubble on screen
+        # display the coin on screen
         if self.active:
-            bubble_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-            pygame.draw.circle(bubble_surface, (BUBBLE_COLOR[0], BUBBLE_COLOR[1], BUBBLE_COLOR[2], self.alpha),(self.radius, self.radius), self.radius)
-            screen.blit(bubble_surface, (self.x - self.radius, self.y - self.radius))
-            font = pygame.font.Font(None, 30)
-            text = font.render(str(self.value), True, (BLACK))
-            text.set_alpha(self.alpha)  # Apply transparency to text
-            screen.blit(text, (self.x -5, self.y - 9)) # center the text withing the bubble
+            image_copy = self.image.copy()
+            image_copy.set_alpha(self.alpha)
+            screen.blit(image_copy, (self.x, self.y))
 
     def shrink(self):
         """Fade-out effect before disappearing."""
@@ -162,18 +176,18 @@ class Cloud:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-# check if the bird touches a bubble
-def check_bubble_collision():
+# check if the bird touches a coin
+def check_coin_collision():
     global score
-    for bubble in bubbles:
-        if bubble.active:
-            distance = ((bird.x - bubble.x) ** 2 + (bird.y - bubble.y) ** 2) ** 0.5
+    for coin in coins:
+        if coin.active:
+            distance = ((bird.x - coin.x) ** 2 + (bird.y - coin.y) ** 2) ** 0.5
             # collision detected
-            if distance < bubble.radius + 20: 
-                score += bubble.value
-                bubble.value = 0  # Remove points from the bubble
-                bubble.shrink()  # Start fading effect
-                bubble_touched_sound.play()
+            if distance < coin.radius + 20: 
+                score += coin.value
+                coin.value = 0  # Remove points from the coin
+                coin.shrink()  # Start fading effect
+                coin_touched_sound.play()
 
 
 def draw_mountains():
@@ -335,22 +349,22 @@ while running:
 
 
 
-        # bubbles spawn management
-        bubble_timer += 1
-        if bubble_timer >= BUBBLE_SPAWN_TIME:
-            bubbles.append(Bubble()) # create a new bubble
-            bubble_timer = 0 # reset the bubble timer
+        # coins spawn management
+        coin_timer += 1
+        if coin_timer >= COIN_SPAWN_TIME:
+            coins.append(Coin()) # create a new coin
+            coin_timer = 0 # reset the coin timer
 
-        # check fo collision with bubbles
-        check_bubble_collision()
+        # check fo collision with coins
+        check_coin_collision()
 
-        # Display and update bubbles
-        for bubble in bubbles:
-            if bubble.active:
-                bubble.move()
-                bubble.draw(screen)
+        # Display and update coins
+        for coin in coins:
+            if coin.active:
+                coin.move()
+                coin.draw(screen)
             else:
-                bubbles.remove(bubble) # Remove inactive bubbles
+                coins.remove(coin) # Remove inactive coins
 
         # Timer
         # Calculate timer
