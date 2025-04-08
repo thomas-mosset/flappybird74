@@ -12,7 +12,6 @@ font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
 font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
 font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 
-
 # musics
 pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
 pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
@@ -27,14 +26,6 @@ bubble_touched_sound.set_volume(0.2)
 
 # initialization of the timer (in milliseconds)
 start_time = pygame.time.get_ticks()
-
-# game's images / icons
-timer_img = pygame.image.load("assets/icons/timer.png")
-timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
-
-trophy_img = pygame.image.load("assets/icons/trophy.png")
-trophy_img = pygame.transform.scale(trophy_img, (30, 30))
-
 
 # game's constants
 WIDTH = 1280
@@ -75,6 +66,15 @@ SKY_BLUE = (135, 206, 235)
 GREEN_GRASS = (88, 158, 41)
 DARK_GREEN = (51, 92, 36)
 BUBBLE_COLOR = (248, 191, 23)
+
+# game's images / icons
+timer_img = pygame.image.load("assets/icons/timer.png")
+timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
+
+trophy_img = pygame.image.load("assets/icons/trophy.png")
+trophy_img = pygame.transform.scale(trophy_img, (30, 30))
+
+grass_img = pygame.image.load("assets/background_elements/grass.png")
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -173,7 +173,7 @@ def draw_cloud(x, y):
 
 
 def draw_grass():
-    pygame.draw.rect(screen, GREEN_GRASS, (0, HEIGHT - 230, WIDTH, 500))
+    screen.blit(grass_img, (0, HEIGHT - grass_img.get_height()))
 
 
 def draw_tree(x, base_y, height):
