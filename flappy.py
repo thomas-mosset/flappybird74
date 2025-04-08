@@ -74,7 +74,8 @@ timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
 trophy_img = pygame.image.load("assets/icons/trophy.png")
 trophy_img = pygame.transform.scale(trophy_img, (30, 30))
 
-grass_img = pygame.image.load("assets/background_elements/grass.png")
+grass_img = pygame.image.load("assets/background_elements/grass.bmp")
+mountain_img = pygame.image.load("assets/background_elements/mountain.bmp")
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -153,11 +154,7 @@ def check_bubble_collision():
 
 
 def draw_mountains():
-    # draw.polygon allows to draw triangles
-    pygame.draw.polygon(screen, DARK_GRAY, [(50, 500), (200, 300), (350, 500)])  # Big mountain
-    pygame.draw.polygon(screen, LIGHT_GRAY, [(170, 335), (200, 300), (230, 335)])  # Snow on big mountain
-    pygame.draw.polygon(screen, GRAY, [(200, 520), (300, 400), (400, 520)])  # Small mountain
-    pygame.draw.polygon(screen, LIGHT_GRAY, [(280, 420), (300, 400), (320, 420)])  # Snow on small mountain
+    screen.blit(mountain_img, (0, HEIGHT - mountain_img.get_height()))
 
 def draw_cloud(x, y):
     cloud_pixels = [
@@ -170,7 +167,7 @@ def draw_cloud(x, y):
 
     for px, py in cloud_pixels:
         pygame.draw.rect(screen, WHITE, ((x + px * (PIXEL_SIZE * 2.5), y + py * (PIXEL_SIZE * 2.5), (PIXEL_SIZE * 2.5), (PIXEL_SIZE * 2.5))))
-
+    
 
 def draw_grass():
     screen.blit(grass_img, (0, HEIGHT - grass_img.get_height()))
@@ -234,8 +231,8 @@ countdown()
 while running:
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
-    draw_grass() # grass / ground
     draw_mountains() # mountains
+    draw_grass() # grass / ground
     # different clouds -> draw_cloud(X axis, Y axis)
     draw_cloud(20, 80)
     draw_cloud(360, 200)
