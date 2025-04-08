@@ -6,6 +6,13 @@ import time
 # initialization of pygame
 pygame.init()
 
+# fonts
+font_26 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
+font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
+font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
+font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
+
+
 # musics
 pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
 pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
@@ -201,19 +208,20 @@ def point_in_triangle(px, py, ax, ay, bx, by, cx, cy):
 
 def countdown():
     global game_started
-    font = pygame.font.Font(None, 100)
-    
+
     for i in range(3, 0, -1):
         screen.fill(SKY_BLUE)
-        text = font.render(str(i), True, BLACK)
-        screen.blit(text, (WIDTH // 2 - 30, HEIGHT // 2 - 50))
+        text = font_100.render(str(i), True, BLACK)
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
         pygame.display.flip()
         time.sleep(1) # wait 1 sec between each number display
     
     # Display "GO!"
     screen.fill(SKY_BLUE)
-    text = font.render("GO!", True, BLACK)
-    screen.blit(text, (WIDTH // 2 - 80, HEIGHT // 2 - 50))
+    text = font_100.render("GO!", True, BLACK)
+    go_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, go_rect)
     pygame.display.flip()
     time.sleep(1) # wait 1 sec before displaying "GO!"
 
@@ -337,21 +345,17 @@ while running:
             else:
                 bubbles.remove(bubble) # Remove inactive bubbles
 
-
-        # Info displayed on screen (timer + score)
-        font = pygame.font.Font(None, 36)
-
         # Timer
         # Calculate timer
         elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
 
         # Display timer
-        timer_text = font.render(f"Time: {elapsed_time}s", True, BLACK)
+        timer_text = font_26.render(f"Time: {elapsed_time}s", True, BLACK)
         screen.blit(timer_text, (55, 19)) # Position at the top
         screen.blit(timer_img, (20, 15))
 
         # Display score
-        score_text = font.render(f"Score: {score}", True, BLACK)
+        score_text = font_26.render(f"Score: {score}", True, BLACK)
         screen.blit(score_text, (55, 55)) # Position at the top but slightly lower than the timer
         screen.blit(trophy_img, (20, 50))
 
@@ -363,9 +367,9 @@ while running:
        
     # if game is paused / Pause screen
     if game_paused:
-        game_paused_font = pygame.font.Font(None, 80)
-        game_paused_text = game_paused_font.render("PAUSE", True, (255, 0, 0))
-        screen.blit(game_paused_text, (WIDTH // 2 - 100, HEIGHT // 2 - 40))
+        game_paused_text = font_80.render("PAUSE", True, (255, 0, 0))
+        pause_rect = game_paused_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(game_paused_text, pause_rect)
 
 
     # refresh the screen
@@ -375,21 +379,26 @@ while running:
 
 
 # Ending screen
-
 pygame.mixer.music.stop() # stop the game's music loop
 game_over_sound.play() # play the game over sound
 
-eding_font_big = pygame.font.Font(None, 100)
-eding_font_small = pygame.font.Font(None, 50)
-
 screen.fill((0, 0, 0)) # black background
-game_over_text = eding_font_big.render("GAME OVER", True, (255, 0, 0))
-score_text = eding_font_small.render(f"Score: {score}", True, (255, 255, 255))
-time_text = eding_font_small.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
 
-screen.blit(game_over_text, (WIDTH // 2 - 200, HEIGHT // 2 - 100))
-screen.blit(score_text, (WIDTH // 2 - 100, HEIGHT // 2))
-screen.blit(time_text, (WIDTH // 2 - 100, HEIGHT // 2 + 60))
+# .get_rect() allows to get a rectangle around the text
+#  then we just have to center it 
+
+game_over_text = font_100.render("GAME OVER", True, (255, 0, 0))
+game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
+screen.blit(game_over_text, game_over_rect)
+
+score_text = font_50.render(f"Score: {score}", True, (255, 255, 255))
+score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+screen.blit(score_text, score_rect)
+
+time_text = font_50.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
+time_rect = time_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
+screen.blit(time_text, time_rect)
+
 
 pygame.display.flip()
 
