@@ -2,6 +2,7 @@
 import pygame
 import random
 import time
+import math
 
 # initialization of pygame
 pygame.init()
@@ -84,6 +85,16 @@ orange_coin_3_img = pygame.image.load("assets/icons/3-coin-orange.bmp")
 pink_coin_4_img = pygame.image.load("assets/icons/4-coin-pink.bmp")
 star_coin_5_img = pygame.image.load("assets/icons/5-coin-star.bmp")
 
+
+# dictionary to group coin img
+coin_images = {
+    1: blue_coin_1_img,
+    2: yellow_coin_2_img,
+    3: orange_coin_3_img,
+    4: pink_coin_4_img,
+    5: star_coin_5_img
+}
+
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird 74")
@@ -119,7 +130,13 @@ class Coin:
         self.radius = 25 # initial size of the coin
         self.value = random.randint(1, 5) # random points value between 1 and 5
         self.active = True # to deal with its deleting
-        self.alpha = 255  # Fully 
+        self.touched = False
+        self.scored = False
+
+        # for the animation
+        self.number_of_flips = 3
+        self.flip_progress = 0  # from 0 to 1
+        self.flip_speed = 0.2  # adjust for faster or slower flip
         
         # assign values to icons
         self.image = {
@@ -143,16 +160,28 @@ class Coin:
         # display the coin on screen
         if self.active:
             image_copy = self.image.copy()
-            image_copy.set_alpha(self.alpha)
             screen.blit(image_copy, (self.x, self.y))
 
-    def shrink(self):
-        """Fade-out effect before disappearing."""
-        if self.alpha > 0:
-            self.alpha -= 15  # Reduce transparency
-            self.radius -= 1
-        else:
-            self.active = False  # Remove when fully transparent
+    def animate_flip(self):
+        if not self.touched:
+            return
+
+        self.flip_progress += self.flip_speed
+
+        if self.flip_progress >= self.number_of_flips:
+            self.flip_progress = self.number_of_flips  # limit to its maximum
+            if self.active:
+                self.active = False  # end of animation
+
+        # simulate the 3D flip
+        angle = self.flip_progress * 360  / self.number_of_flips # 360° rotation
+
+        # Apply rotation
+        rotated_image = pygame.transform.rotate(self.image, angle)
+        rotated_rect = rotated_image.get_rect(center=(self.x + self.radius, self.y + self.radius))
+
+        # Show coin with its rotation
+        screen.blit(rotated_image, rotated_rect.topleft)
 
 
 class Cloud:
@@ -183,10 +212,10 @@ def check_coin_collision():
         if coin.active:
             distance = ((bird.x - coin.x) ** 2 + (bird.y - coin.y) ** 2) ** 0.5
             # collision detected
-            if distance < coin.radius + 20: 
+            if distance < coin.radius + 20 and not coin.touched:
+                coin.touched = True
+                coin.scored = True
                 score += coin.value
-                coin.value = 0  # Remove points from the coin
-                coin.shrink()  # Start fading effect
                 coin_touched_sound.play()
 
 
@@ -352,8 +381,13 @@ while running:
         # coins spawn management
         coin_timer += 1
         if coin_timer >= COIN_SPAWN_TIME:
-            coins.append(Coin()) # create a new coin
-            coin_timer = 0 # reset the coin timer
+            new_coin = Coin()  # Create a new coin
+
+            # Check if the new coin spawns too close to any existing coin
+            if not any(abs(new_coin.x - coin.x) < 40 and abs(new_coin.y - coin.y) < 40 for coin in coins):
+                coins.append(new_coin)  # Only add the coin if it's far enough from existing coins
+
+            coin_timer = 0  # Reset the coin timer
 
         # check fo collision with coins
         check_coin_collision()
@@ -362,7 +396,10 @@ while running:
         for coin in coins:
             if coin.active:
                 coin.move()
-                coin.draw(screen)
+                if coin.touched:
+                    coin.animate_flip()
+                else:
+                    coin.draw(screen)
             else:
                 coins.remove(coin) # Remove inactive coins
 
