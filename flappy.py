@@ -69,10 +69,10 @@ DARK_GREEN = (51, 92, 36)
 coin_COLOR = (248, 191, 23)
 
 # game's images / icons
-timer_img = pygame.image.load("assets/icons/timer.png")
+timer_img = pygame.image.load("assets/icons/timer.bmp")
 timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
 
-trophy_img = pygame.image.load("assets/icons/trophy.png")
+trophy_img = pygame.image.load("assets/icons/trophy.bmp")
 trophy_img = pygame.transform.scale(trophy_img, (30, 30))
 
 grass_img = pygame.image.load("assets/background_elements/grass.bmp")
@@ -409,12 +409,12 @@ while running:
 
         # Display timer
         timer_text = font_26.render(f"Time: {elapsed_time}s", True, BLACK)
-        screen.blit(timer_text, (55, 19)) # Position at the top
+        screen.blit(timer_text, (60, 19)) # Position at the top
         screen.blit(timer_img, (20, 15))
 
         # Display score
         score_text = font_26.render(f"Score: {score}", True, BLACK)
-        screen.blit(score_text, (55, 55)) # Position at the top but slightly lower than the timer
+        screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
         screen.blit(trophy_img, (20, 50))
 
 
