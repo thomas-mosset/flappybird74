@@ -1,27 +1,28 @@
-# Flappy Bird 74
+# Flappy Bird 74 (v2)
 
-Le jeu reprend le concept de Flappy bird. Ici les tuyaux sont remplacés par des arbres. Et le joueur ou la joueuse peut gagner des points en touchant des bulles de points.
+Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner des points en touchant des bulles de points.
 
 ## Technologies utilisées
 
 - Pygame
 - Watchdog
 
-## Fonctionnalités (v1)
+## Fonctionnalités (v2)
 
 - Saut de l’oiseau
-- Collision avec les arbres
+- Collision avec les tuyaux
 - Ajout de points lorsqu'une bulle est touchée
 - Mettre en pause / reprendre le jeu
 
-## Ressources utilisées (v1)
+## Ressources utilisées (v2)
 
-- Images et décors (personnage, arbres, nuages, bulle de points, etc.) : Pygame
+- Personnage : Pygame
+- Images et décors (tuyaux, nuages, pièces, montagne, etc.) : Canva
 - Musique : [POL-magical-sun-short de Filippo Vicarelli](https://www.filippovicarelli.com/8bit-game-background-music)
 - Sons : [Soundsnap](https://www.soundsnap.com/)
 - Font : Press Start 2P de CodeMan38
 
-## Démo
+## Démo (v1)
 
 [![Démo du jeu](https://markdown-videos-api.jorgenkh.no/youtube/B4nhvpC_mMQ)](https://youtu.be/B4nhvpC_mMQ)
 

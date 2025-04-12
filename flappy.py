@@ -2,7 +2,6 @@
 import pygame
 import random
 import time
-import math
 
 # initialization of pygame
 pygame.init()
@@ -32,16 +31,14 @@ start_time = pygame.time.get_ticks()
 WIDTH = 1280
 HEIGHT = 720
 PIXEL_SIZE = 4 # size an enlarged pixel
-TREE_WIDTH = 80
-TREE_MIN_HEIGHT = 200
-TREE_MAX_HEIGHT = 620
-TREE_GAP = 235
-TREE_SPEED = 2
 GRAVITY = 1 # makes the bird fall down
 JUMP_STRENGTH = -12 # bird's jump strenght
 BIRD_VERTICAL_SPEED = 0
 COIN_SPAWN_TIME = 180 # a coin every 3 sec (60 FPS * 3)
 COIN_SPEED = 2 # speed of moving coins
+PIPE_HEIGHT = 720
+PIPE_SPEED = 2
+PIPE_DISTANCE = 300
 
 # game's variables
 clock = pygame.time.Clock()
@@ -50,8 +47,8 @@ running = True
 coins = []
 coin_timer = 0 # to calculate the spawn time of a coin
 score = 0
-game_started = False  # New variable for countdown
 game_paused = False
+
 
 # game's colors (RGB)
 WHITE = (255, 255, 255)
@@ -66,7 +63,6 @@ LIGHT_GRAY = (200, 200, 200)
 SKY_BLUE = (135, 206, 235)
 GREEN_GRASS = (88, 158, 41)
 DARK_GREEN = (51, 92, 36)
-coin_COLOR = (248, 191, 23)
 
 # game's images / icons
 timer_img = pygame.image.load("assets/icons/timer.bmp")
@@ -85,7 +81,6 @@ orange_coin_3_img = pygame.image.load("assets/icons/3-coin-orange.bmp")
 pink_coin_4_img = pygame.image.load("assets/icons/4-coin-pink.bmp")
 star_coin_5_img = pygame.image.load("assets/icons/5-coin-star.bmp")
 
-
 # dictionary to group coin img
 coin_images = {
     1: blue_coin_1_img,
@@ -94,6 +89,22 @@ coin_images = {
     4: pink_coin_4_img,
     5: star_coin_5_img
 }
+
+xs_pipe_img = pygame.image.load("assets/pipes/xs_pipe.bmp")
+s_pipe_img = pygame.image.load("assets/pipes/s_pipe.bmp")
+m_pipe_img = pygame.image.load("assets/pipes/m_pipe.bmp")
+l_pipe_img = pygame.image.load("assets/pipes/l_pipe.bmp")
+xl_pipe_img = pygame.image.load("assets/pipes/xl_pipe.bmp")
+
+# dictionary to group pipes img
+pipe_images = {
+    "xs": xs_pipe_img,
+    "s": s_pipe_img,
+    "m": m_pipe_img,
+    "l": l_pipe_img,
+    "xl": xl_pipe_img
+}
+
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -120,6 +131,34 @@ def create_pixel_bird():
 
 bird_img = create_pixel_bird()
 bird = pygame.Rect(100, 200, 48, 48)
+
+
+# Active pipes list
+pipes = []
+
+# Pipe's collision
+class Pipe:
+    def __init__(self, x):
+        self.size = random.choice(list(pipe_images.keys())) # get a random size trough the dictionary's keys
+        self.image = pipe_images[self.size] # get the image corresponding to the key
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        self.x = x # initial position on the X axis on the pipe's creation
+        self.y = HEIGHT - self.height # position the image on the bottom of the screen
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height) # rectangle collision
+        self.mask = pygame.mask.from_surface(self.image)  # creation of the pixel-perfect collision mask that respects transparency. This gives an accurate collision with the actual shape of the pipe (not just its rectangle).
+
+    def move(self):
+        self.x -= PIPE_SPEED # move the pipe from right to left
+        self.rect.x = self.x # update the pipe collision position
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y)) # display on screen the pipe at its current position
+
+    def collides_with(self, bird_rect):
+        offset = (int(bird_rect.x - self.x), int(bird_rect.y - self.y)) # relative position between the pipe and the bird
+        bird_mask = pygame.mask.from_surface(bird_img)
+        return self.mask.overlap(bird_mask, offset) is not None # mask.overlap -> checks if there is an overlap between the bird and pipe masks
 
 
 class Coin:
@@ -186,7 +225,6 @@ class Coin:
 
 class Cloud:
     def __init__(self):
-        self.image = cloud_img
         self.x = WIDTH + random.randint(0, 400) # cloud starts outisde the right screen, at a random position
         self.y = random.randint(5, 80) # cloud is random height level
         self.speed = random.uniform(0.5, 1.5) # each cloud will have a random speed
@@ -227,36 +265,6 @@ def draw_grass():
     screen.blit(grass_img, (0, HEIGHT - grass_img.get_height()))
 
 
-def draw_tree(x, base_y, height):
-    trunk_height = 40 # trunk's height is fixed
-    leafs_height = height # tree's leafs' height is random (determined between TREE_MIN_HEIGHT and TREE_MAX_HEIGHT)
-
-    # tree trunk
-    # x + TREE_WIDTH//3 -> horizontal centered position
-    # base_y - trunk_height -> vertical position, in grass
-    # TREE_WIDTH//3 -> trunk width
-    pygame.draw.rect(screen, BROWN, (x + TREE_WIDTH//3, base_y - trunk_height, TREE_WIDTH//3, trunk_height))
-
-    # tree leafs
-    pygame.draw.polygon(screen, DARK_GREEN, [
-        (x, base_y - trunk_height), # Lower left corner
-        (x + TREE_WIDTH//2, base_y - trunk_height - leafs_height), # top lof the triangle
-        (x + TREE_WIDTH, base_y - trunk_height) # Lower right corner
-    ])  
-
-# WIDTH + i * TREE_GAP -> trees are placed outside the screen and appears progressively
-# HEIGHT -> they're placed on the grass
-# random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT) -> height of leafs is random 
-trees = [(WIDTH + i * TREE_GAP, HEIGHT, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT)) for i in range(6)]
-
-def point_in_triangle(px, py, ax, ay, bx, by, cx, cy):
-    detT = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
-    alpha = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / detT
-    beta = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / detT
-    gamma = 1 - alpha - beta
-    return (0 <= alpha <= 1) and (0 <= beta <= 1) and (0 <= gamma <= 1)
-
-
 def countdown():
     global game_started
 
@@ -284,6 +292,9 @@ countdown()
 # Create the clouds
 clouds = [Cloud() for _ in range(4)]
 
+# Create the pipes
+pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)] # Create 3 pipes initially, spaced by PIPE_DISTANCE, off screen to the right
+
 # main loop
 while running:
     # fill the screen with a color
@@ -294,6 +305,10 @@ while running:
     for cloud in clouds:
         cloud.move()
         cloud.draw(screen)
+
+    for pipe in pipes:
+        pipe.move()
+        pipe.draw(screen)
 
     # events management
     for event in pygame.event.get():
@@ -344,38 +359,17 @@ while running:
             BIRD_VERTICAL_SPEED = 0
 
 
-        # trees on screen (display + movement)
-        for i in range(len(trees)):
-            # move trees to left
-            # the tree's X (horizontal) position decreases every TREE_SPEED pixels per image
-            trees[i] = (trees[i][0] - TREE_SPEED, trees[i][1], trees[i][2])
+        # If the last pipe has moved far enough to the left, a new one is created on the right
+        if pipes[-1].x < WIDTH - PIPE_DISTANCE:
+            pipes.append(Pipe(WIDTH))
 
-            # Every tree is re-drawn at its new position
-            draw_tree(trees[i][0], trees[i][1], trees[i][2])
+        # Only keep the pipes that are still visible on screen
+        pipes = [pipe for pipe in pipes if pipe.x + pipe.width > 0]
 
-            # if the tree is totally out of the screen on the left, it's then repositionned à the right (WIDTH)
-            # and its height is randomly reset
-            if trees[i][0] < -TREE_WIDTH:
-                trees[i] = (WIDTH, HEIGHT - 30, random.randint(TREE_MIN_HEIGHT, TREE_MAX_HEIGHT))
-            
-            # definition of rectangles collision for the trees
-            trunk_rect_collision = pygame.Rect(trees[i][0] + TREE_WIDTH//3, trees[i][1] - 40, TREE_WIDTH//3, 40)
-
-            # check if collision between the bird and the tree's trunk
-            if bird.colliderect(trunk_rect_collision) :
-                running = False # stop the game
-
-
-            # Collision detection with leaves
-            ax, ay = trees[i][0], trees[i][1] - 40
-            bx, by = trees[i][0] + TREE_WIDTH//2, trees[i][1] - 40 - trees[i][2]
-            cx, cy = trees[i][0] + TREE_WIDTH, trees[i][1] - 40
-
-            for corner in [(bird.x, bird.y), (bird.x + bird.width, bird.y),
-                        (bird.x, bird.y + bird.height), (bird.x + bird.width, bird.y + bird.height)]:
-                if point_in_triangle(corner[0], corner[1], ax, ay, bx, by, cx, cy):
-                    running = False  # Collision with leaves
-
+        for pipe in pipes:
+            # if one of the pipes collide with the bird, we stop the game
+            if pipe.collides_with(bird):
+                running = False
 
 
         # coins spawn management
