@@ -11,7 +11,7 @@ Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner de
 
 - Saut de l’oiseau
 - Collision avec les tuyaux
-- Ajout de points lorsqu'une bulle est touchée
+- Ajout de points lorsqu'une pièce est touchée
 - Mettre en pause / reprendre le jeu
 
 ## Ressources utilisées (v2)
