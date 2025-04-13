@@ -12,6 +12,11 @@ font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
 font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
 font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 
+
+# screens
+countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
+
+
 # musics
 pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
 pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
@@ -269,7 +274,7 @@ def countdown():
     global game_started
 
     for i in range(3, 0, -1):
-        screen.fill(SKY_BLUE)
+        screen.blit(countdown_screen, (0, 0))
         text = font_100.render(str(i), True, BLACK)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(text, text_rect)
@@ -277,13 +282,14 @@ def countdown():
         time.sleep(1) # wait 1 sec between each number display
     
     # Display "GO!"
-    screen.fill(SKY_BLUE)
+    screen.blit(countdown_screen, (0, 0))
     text = font_100.render("GO!", True, BLACK)
     go_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
     screen.blit(text, go_rect)
     pygame.display.flip()
     time.sleep(1) # wait 1 sec before displaying "GO!"
 
+    screen.fill(SKY_BLUE)
     game_started = True  # Start the game after countdown
 
 # Start countdown before entering main loop
