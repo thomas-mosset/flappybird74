@@ -1,6 +1,6 @@
 # Flappy Bird 74 (v2)
 
-Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner des points en touchant des bulles de points.
+Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner des points en touchant des pièces, et doit esquiver des tuyaux.
 
 ## Technologies utilisées
 
@@ -13,6 +13,7 @@ Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner de
 - Collision avec les tuyaux
 - Ajout de points lorsqu'une pièce est touchée
 - Mettre en pause / reprendre le jeu
+- Menu
 
 ## Ressources utilisées (v2)
 
