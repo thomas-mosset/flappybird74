@@ -328,18 +328,22 @@ def quit_game():
     game_started = False
     running = False
 
+def go_to_params_menu():
+    print("def go_to_params_menu")
 
 # screens assets
 ## Load btn images
 menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
+menu_params_btn = pygame.image.load("assets/screens/screens_elements/menu_params.png").convert_alpha()
 
 ## resize btn images
 resized_menu_btn = pygame.transform.scale(menu_btn, (200, 80))
+resized_menu_params_bt = pygame.transform.scale(menu_params_btn, (135, 135))
 
 # Create btns
 start_menu_btn = Button(resized_menu_btn, (640, 300), "START", font_26, start_game)
+params_menu_btn = Button(resized_menu_params_bt, (640, 425), "", font_26, go_to_params_menu)
 quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
-
 
 # Create the clouds
 clouds = [Cloud() for _ in range(4)]
@@ -355,6 +359,7 @@ while running:
         screen.blit(base_menu_screen, (0, 0))
         screen.blit(title_main_menu_text, title_main_menu_rect) 
         start_menu_btn.draw(screen)
+        params_menu_btn.draw(screen)
         quit_menu_btn.draw(screen)
 
         for event in pygame.event.get():
@@ -362,6 +367,7 @@ while running:
                 game_over = True
                 running = False
             start_menu_btn.handle_event(event)
+            params_menu_btn.handle_event(event)
             quit_menu_btn.handle_event(event)
 
         pygame.display.flip()
@@ -391,6 +397,7 @@ while running:
         
         # menus management
         start_menu_btn.handle_event(event)
+        params_menu_btn.handle_event(event)
         quit_menu_btn.handle_event(event)
 
         # if a key from the keyboard is pressed
