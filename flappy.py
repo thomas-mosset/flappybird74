@@ -16,6 +16,9 @@ font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 title_main_menu_text = font_50.render("MENU", True, (255, 255, 255))
 title_main_menu_rect = title_main_menu_text.get_rect(center=(640, 150))
 
+number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
+number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
+
 # screens
 countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
 base_menu_screen = pygame.image.load("assets/screens/base_menu_screen.png")
@@ -358,6 +361,8 @@ while running:
         # MAIN MENU
         screen.blit(base_menu_screen, (0, 0))
         screen.blit(title_main_menu_text, title_main_menu_rect) 
+        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+
         start_menu_btn.draw(screen)
         params_menu_btn.draw(screen)
         quit_menu_btn.draw(screen)
