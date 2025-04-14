@@ -12,10 +12,13 @@ font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
 font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
 font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 
+# menus titles
+title_main_menu_text = font_50.render("MENU", True, (255, 255, 255))
+title_main_menu_rect = title_main_menu_text.get_rect(center=(640, 150))
 
 # screens
 countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
-
+base_menu_screen = pygame.image.load("assets/screens/base_menu_screen.png")
 
 # musics
 pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
@@ -52,6 +55,9 @@ running = True
 coins = []
 coin_timer = 0 # to calculate the spawn time of a coin
 score = 0
+
+game_started =False
+game_over = False
 game_paused = False
 
 
@@ -140,6 +146,23 @@ bird = pygame.Rect(100, 200, 48, 48)
 
 # Active pipes list
 pipes = []
+
+
+class Button:
+    def __init__(self, image, pos, text, font, callback):
+        self.image = image
+        self.rect = self.image.get_rect(center=pos)
+        self.text_surf = font.render(text, True, (255, 255, 255))
+        self.text_rect = self.text_surf.get_rect(center=self.rect.center)
+        self.callback = callback
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+        screen.blit(self.text_surf, self.text_rect)
+    
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
+            self.callback()
 
 # Pipe's collision
 class Pipe:
@@ -292,8 +315,23 @@ def countdown():
     screen.fill(SKY_BLUE)
     game_started = True  # Start the game after countdown
 
-# Start countdown before entering main loop
-countdown()
+
+def start_game():
+    countdown() # Launch the beginning countdown
+    global game_started
+    game_started = True  # game starts after the countdown
+
+
+# screens assets
+## Load btn images
+start_menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
+
+## resize btn images
+resized_start_menu_btn = pygame.transform.scale(start_menu_btn, (200, 80))
+
+# Create btns
+start_menu_btn = Button(resized_start_menu_btn, (640, 300), "START", font_26, start_game)
+
 
 # Create the clouds
 clouds = [Cloud() for _ in range(4)]
@@ -303,10 +341,29 @@ pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)] # Create 3 pipes ini
 
 # main loop
 while running:
+
+    if not game_started:
+        # MAIN MENU
+        screen.blit(base_menu_screen, (0, 0))
+        screen.blit(title_main_menu_text, title_main_menu_rect) 
+        start_menu_btn.draw(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+                running = False
+            start_menu_btn.handle_event(event)
+
+        pygame.display.flip()
+        clock.tick(60)
+        continue  # we skip the loop as long as the game has not begun
+
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
     draw_mountains()
     draw_grass()
+
+
 
     for cloud in clouds:
         cloud.move()
@@ -321,10 +378,12 @@ while running:
         # pygame .QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
+        
+        # menus management
+        start_menu_btn.handle_event(event)
 
         # if a key from the keyboard is pressed
         if event.type == pygame.KEYDOWN:
-
             # if the key is equal to the space key or the up key
             if event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                 # the bird jumps
@@ -343,6 +402,7 @@ while running:
 
         # if bird is out of the bottom of the screen, reload the game (player has lost)
         if bird.y + bird.height >= HEIGHT:
+            game_over = True
             running = False # stop the game
 
 
@@ -375,6 +435,7 @@ while running:
         for pipe in pipes:
             # if one of the pipes collide with the bird, we stop the game
             if pipe.collides_with(bird):
+                game_over = True
                 running = False
 
 
