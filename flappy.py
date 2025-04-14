@@ -8,6 +8,7 @@ pygame.init()
 
 # fonts
 font_26 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
+font_40 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 40)
 font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
 font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
 font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
@@ -15,6 +16,9 @@ font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 # menus titles
 title_main_menu_text = font_50.render("MENU", True, (255, 255, 255))
 title_main_menu_rect = title_main_menu_text.get_rect(center=(640, 150))
+
+title_params_menu_text = font_40.render("PARAMS", True, (255, 255, 255))
+title_params_menu_rect = title_params_menu_text.get_rect(center=(640, 150))
 
 number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
 number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
@@ -59,9 +63,13 @@ coins = []
 coin_timer = 0 # to calculate the spawn time of a coin
 score = 0
 
-game_started =False
+game_started = False
 game_over = False
 game_paused = False
+
+# Menus management
+main_menu = True
+params_menu = False
 
 
 # game's colors (RGB)
@@ -332,21 +340,39 @@ def quit_game():
     running = False
 
 def go_to_params_menu():
-    print("def go_to_params_menu")
+    global params_menu, main_menu
+    params_menu = True
+    main_menu = False
+
+def go_back():
+    print("def go_back")
+
+def go_to_music_menu():
+    print("def go_to_music_menu")
+
+def go_to_controls_menu():
+    print("def go_to_controls_menu")
 
 # screens assets
 ## Load btn images
 menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
 menu_params_btn = pygame.image.load("assets/screens/screens_elements/menu_params.png").convert_alpha()
+params_menu_headphone_btn = pygame.image.load("assets/screens/screens_elements/params_headphone.png").convert_alpha()
+params_menu_gamestick_btn = pygame.image.load("assets/screens/screens_elements/params_gamestick.png").convert_alpha()
 
 ## resize btn images
 resized_menu_btn = pygame.transform.scale(menu_btn, (200, 80))
-resized_menu_params_bt = pygame.transform.scale(menu_params_btn, (135, 135))
+resized_menu_params_btn = pygame.transform.scale(menu_params_btn, (135, 135))
+resized_params_menu_headphone_btn = pygame.transform.scale(params_menu_headphone_btn, (125, 125))
+resized_params_menu_gamestick_btn = pygame.transform.scale(params_menu_gamestick_btn, (125, 125))
 
 # Create btns
 start_menu_btn = Button(resized_menu_btn, (640, 300), "START", font_26, start_game)
-params_menu_btn = Button(resized_menu_params_bt, (640, 425), "", font_26, go_to_params_menu)
+params_menu_btn = Button(resized_menu_params_btn, (640, 425), "", font_26, go_to_params_menu)
 quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
+headphone_btn = Button(resized_params_menu_headphone_btn, (640, 300), "", font_26, go_to_music_menu)
+gamestick_btn = Button(resized_params_menu_gamestick_btn, (640, 435), "", font_26, go_to_controls_menu)
+back_btn = Button(resized_menu_btn, (640, 550), "BACK", font_26, go_back)
 
 # Create the clouds
 clouds = [Cloud() for _ in range(4)]
@@ -358,32 +384,56 @@ pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)] # Create 3 pipes ini
 while running:
 
     if not game_started:
-        # MAIN MENU
-        screen.blit(base_menu_screen, (0, 0))
-        screen.blit(title_main_menu_text, title_main_menu_rect) 
-        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
-        start_menu_btn.draw(screen)
-        params_menu_btn.draw(screen)
-        quit_menu_btn.draw(screen)
+        if main_menu:
+            # MAIN MENU
+            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(title_main_menu_text, title_main_menu_rect) 
+            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = True
-                running = False
-            start_menu_btn.handle_event(event)
-            params_menu_btn.handle_event(event)
-            quit_menu_btn.handle_event(event)
+            start_menu_btn.draw(screen)
+            params_menu_btn.draw(screen)
+            quit_menu_btn.draw(screen)
 
-        pygame.display.flip()
-        clock.tick(60)
-        continue  # we skip the loop as long as the game has not begun
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    running = False
+                start_menu_btn.handle_event(event)
+                params_menu_btn.handle_event(event)
+                quit_menu_btn.handle_event(event)
+
+            pygame.display.flip()
+            clock.tick(60)
+            continue  # we skip the loop as long as the game has not begun
+
+        elif params_menu:
+            # PARAMS MENU
+            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(title_params_menu_text, title_params_menu_rect) 
+            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+
+            headphone_btn.draw(screen)
+            gamestick_btn.draw(screen)
+            back_btn.draw(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    running = False
+                headphone_btn.handle_event(event)
+                gamestick_btn.handle_event(event)
+                back_btn.handle_event(event)
+
+            pygame.display.flip()
+            clock.tick(60)
+            continue  # we skip the loop as long as the game has not begun
+
 
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
     draw_mountains()
     draw_grass()
-
 
 
     for cloud in clouds:
@@ -404,6 +454,7 @@ while running:
         start_menu_btn.handle_event(event)
         params_menu_btn.handle_event(event)
         quit_menu_btn.handle_event(event)
+        back_btn.handle_event(event)
 
         # if a key from the keyboard is pressed
         if event.type == pygame.KEYDOWN:
