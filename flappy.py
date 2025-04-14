@@ -322,15 +322,23 @@ def start_game():
     game_started = True  # game starts after the countdown
 
 
+def quit_game():
+    global game_started
+    global running
+    game_started = False
+    running = False
+
+
 # screens assets
 ## Load btn images
-start_menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
+menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
 
 ## resize btn images
-resized_start_menu_btn = pygame.transform.scale(start_menu_btn, (200, 80))
+resized_menu_btn = pygame.transform.scale(menu_btn, (200, 80))
 
 # Create btns
-start_menu_btn = Button(resized_start_menu_btn, (640, 300), "START", font_26, start_game)
+start_menu_btn = Button(resized_menu_btn, (640, 300), "START", font_26, start_game)
+quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
 
 
 # Create the clouds
@@ -347,12 +355,14 @@ while running:
         screen.blit(base_menu_screen, (0, 0))
         screen.blit(title_main_menu_text, title_main_menu_rect) 
         start_menu_btn.draw(screen)
+        quit_menu_btn.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
                 running = False
             start_menu_btn.handle_event(event)
+            quit_menu_btn.handle_event(event)
 
         pygame.display.flip()
         clock.tick(60)
@@ -381,6 +391,7 @@ while running:
         
         # menus management
         start_menu_btn.handle_event(event)
+        quit_menu_btn.handle_event(event)
 
         # if a key from the keyboard is pressed
         if event.type == pygame.KEYDOWN:
