@@ -5,6 +5,7 @@ import time
 
 # initialization of pygame
 pygame.init()
+music_on = True
 
 # fonts
 font_26 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
@@ -24,6 +25,9 @@ title_params_menu_rect = title_params_menu_text.get_rect(center=(640, 150))
 title_controls_menu_text = font_30.render("CONTROLS", True, (255, 255, 255))
 title_controls_menu_rect = title_controls_menu_text.get_rect(center=(640, 150))
 
+title_music_menu_text = font_40.render("MUSIC", True, (255, 255, 255))
+title_music_menu_rect = title_music_menu_text.get_rect(center=(640, 150))
+
 number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
 number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
 
@@ -38,6 +42,12 @@ pause_title_controls_menu_rect = pause_title_controls_menu_text.get_rect(center=
 
 pause_keys_controls_menu_text = font_26.render("escape", True, (0, 0, 0))
 pause_keys_controls_menu_rect = pause_keys_controls_menu_text.get_rect(center=(640, 450))
+
+music_on_text = font_26.render("ON", True, (116, 160, 80) if music_on else (0, 0, 0))
+music_on_rect = music_on_text.get_rect(center=(570, 430))
+
+music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
+music_off_rect = music_off_text.get_rect(center=(710, 430))
 
 # screens
 countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
@@ -363,7 +373,9 @@ def go_back(current_menu_name, previous_menu_name):
     globals()[previous_menu_name] = True
 
 def go_to_music_menu():
-    print("def go_to_music_menu")
+    global params_menu, music_menu
+    params_menu = False
+    music_menu = True
 
 def go_to_controls_menu():
     global params_menu, controls_menu
@@ -371,18 +383,20 @@ def go_to_controls_menu():
     controls_menu = True
 
 
-# screens assets
+# screens / menus assets
 ## Load btn images
 menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
 menu_params_btn = pygame.image.load("assets/screens/screens_elements/menu_params.png").convert_alpha()
 params_menu_headphone_btn = pygame.image.load("assets/screens/screens_elements/params_headphone.png").convert_alpha()
 params_menu_gamestick_btn = pygame.image.load("assets/screens/screens_elements/params_gamestick.png").convert_alpha()
+music_menu_img = pygame.image.load("assets/screens/screens_elements/params_music_note.png").convert_alpha()
 
 ## resize btn images
 resized_menu_btn = pygame.transform.scale(menu_btn, (200, 80))
 resized_menu_params_btn = pygame.transform.scale(menu_params_btn, (135, 135))
 resized_params_menu_headphone_btn = pygame.transform.scale(params_menu_headphone_btn, (125, 125))
 resized_params_menu_gamestick_btn = pygame.transform.scale(params_menu_gamestick_btn, (125, 125))
+resized_music_menu_img = pygame.transform.scale(music_menu_img, (100, 100))
 
 # Create btns
 start_menu_btn = Button(resized_menu_btn, (640, 300), "START", font_26, start_game)
@@ -390,6 +404,9 @@ params_menu_btn = Button(resized_menu_params_btn, (640, 425), "", font_26, go_to
 quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
 headphone_btn = Button(resized_params_menu_headphone_btn, (640, 300), "", font_26, go_to_music_menu)
 gamestick_btn = Button(resized_params_menu_gamestick_btn, (640, 435), "", font_26, go_to_controls_menu)
+
+# it's just an img not a btn so we use get_rect()
+resized_music_menu_img_rect = resized_music_menu_img.get_rect(center=(640, 330))
 
 # reusable go back btn 
 def create_back_button(current_menu, previous_menu):
@@ -482,6 +499,45 @@ while running:
             pygame.display.flip()
             clock.tick(60)
             continue  # we skip the loop as long as the game has not begun
+
+
+        elif music_menu:
+            music_on_text = font_26.render("ON", True, (116, 160, 80) if music_on else (0, 0, 0))
+            music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
+
+            # MUSIC MENU
+            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(title_music_menu_text, title_music_menu_rect)
+            screen.blit(resized_music_menu_img, resized_music_menu_img_rect)
+
+            screen.blit(music_on_text, music_on_rect)
+            screen.blit(music_off_text, music_off_rect)
+
+            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+            
+            # create_back_button("current_menu", "previous_menu")
+            back_btn = create_back_button("music_menu", "params_menu")
+            # draw it on screen
+            back_btn.draw(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    running = False
+
+                elif event.type == pygame.MOUSEBUTTONDOWN: # check it click event
+                    if music_on_rect.collidepoint(event.pos):
+                        music_on = True
+                        pygame.mixer.music.set_volume(0.5)  # activate music
+                    elif music_off_rect.collidepoint(event.pos):
+                        music_on = False
+                        pygame.mixer.music.set_volume(0.0)  # turn off music
+                back_btn.handle_event(event)
+
+            pygame.display.flip()
+            clock.tick(60)
+            continue  # we skip the loop as long as the game has not begun
+
 
 
     # fill the screen with a color

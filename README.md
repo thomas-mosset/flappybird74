@@ -13,7 +13,8 @@ Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner de
 - Collision avec les tuyaux
 - Ajout de points lorsqu'une pièce est touchée
 - Mettre en pause / reprendre le jeu
-- Menu
+- Navigation entre les différents menus
+- Musique ON / OFF
 
 ## Ressources utilisées (v2)
 
