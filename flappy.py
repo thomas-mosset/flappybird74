@@ -8,6 +8,7 @@ pygame.init()
 music_on = True
 
 # fonts
+font_21 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 21)
 font_26 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
 font_30 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 30)
 font_40 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 40)
@@ -27,6 +28,9 @@ title_controls_menu_rect = title_controls_menu_text.get_rect(center=(640, 150))
 
 title_music_menu_text = font_40.render("MUSIC", True, (255, 255, 255))
 title_music_menu_rect = title_music_menu_text.get_rect(center=(640, 150))
+
+title_pause_menu_text = font_40.render("PAUSE", True, (255, 255, 255))
+title_pause_menu_rect = title_pause_menu_text.get_rect(center=(640, 150))
 
 number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
 number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
@@ -356,12 +360,15 @@ def start_game():
     global game_started
     game_started = True  # game starts after the countdown
 
-
 def quit_game():
     global game_started
     global running
     game_started = False
     running = False
+
+def resume_game():
+    global game_paused
+    game_paused = False
 
 def go_to_params_menu():
     global params_menu, main_menu
@@ -381,6 +388,12 @@ def go_to_controls_menu():
     global params_menu, controls_menu
     params_menu = False
     controls_menu = True
+
+def go_back_to_main_menu():
+    global main_menu, game_started, game_paused
+    game_started = False
+    main_menu = True
+    game_paused = False
 
 
 # screens / menus assets
@@ -404,6 +417,8 @@ params_menu_btn = Button(resized_menu_params_btn, (640, 425), "", font_26, go_to
 quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
 headphone_btn = Button(resized_params_menu_headphone_btn, (640, 300), "", font_26, go_to_music_menu)
 gamestick_btn = Button(resized_params_menu_gamestick_btn, (640, 435), "", font_26, go_to_controls_menu)
+resume_game_btn = Button(resized_menu_btn, (640, 345), "RESUME", font_21, resume_game)
+back_to_menu_btn = Button(resized_menu_btn, (640, 470), "MENU", font_21, go_back_to_main_menu)
 
 # it's just an img not a btn so we use get_rect()
 resized_music_menu_img_rect = resized_music_menu_img.get_rect(center=(640, 330))
@@ -564,7 +579,6 @@ while running:
         start_menu_btn.handle_event(event)
         params_menu_btn.handle_event(event)
         quit_menu_btn.handle_event(event)
-        back_btn.handle_event(event)
         headphone_btn.handle_event(event)
         gamestick_btn.handle_event(event)
 
@@ -578,12 +592,6 @@ while running:
             # if ESC key is pressed then we pause the game
             if event.key == pygame.K_ESCAPE:
                 game_paused = not game_paused
-                
-                # music on pause
-                if game_paused:
-                    pygame.mixer.music.pause()
-                else:
-                    pygame.mixer.music.unpause()
 
 
         # if bird is out of the bottom of the screen, reload the game (player has lost)
@@ -672,9 +680,24 @@ while running:
        
     # if game is paused / Pause screen
     if game_paused:
-        game_paused_text = font_80.render("PAUSE", True, (255, 0, 0))
-        pause_rect = game_paused_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(game_paused_text, pause_rect)
+        # PAUSE MENU
+        screen.blit(base_menu_screen, (0, 0))
+        screen.blit(title_pause_menu_text, title_pause_menu_rect) 
+        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+
+        resume_game_btn.draw(screen)
+        resume_game_btn.handle_event(event)
+
+        back_to_menu_btn.draw(screen)
+        back_to_menu_btn.handle_event(event)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            resume_game_btn.handle_event(event)
+            back_to_menu_btn.handle_event(event)
+
 
 
     # refresh the screen
