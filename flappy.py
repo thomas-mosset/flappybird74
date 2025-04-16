@@ -355,7 +355,35 @@ def countdown():
     game_started = True  # Start the game after countdown
 
 
+# reset game's values to initial state (use case : the player has already played once but has come back to the main menu - so their data and the game's state doesn't stay as their previous gameplay.)
+def reset_game():
+    global bird, BIRD_VERTICAL_SPEED, score, pipes, coins, coin_timer, start_time
+    global game_over, game_paused, clouds
+
+    # Reset bird position & speed
+    bird.x = 150
+    bird.y = HEIGHT // 2
+    BIRD_VERTICAL_SPEED = 0
+
+    # Reset score & timer
+    score = 0
+    start_time = pygame.time.get_ticks() # start the timer again
+    coin_timer = 0
+
+    # Reset gameplay elements
+    pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)]
+    coins = []
+
+    # Reset clouds
+    clouds = [Cloud() for _ in range(4)]
+
+    # Reset game state flags
+    game_over = False
+    game_paused = False
+
+
 def start_game():
+    reset_game() # Reset the game
     countdown() # Launch the beginning countdown
     global game_started
     game_started = True  # game starts after the countdown
