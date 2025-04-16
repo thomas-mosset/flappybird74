@@ -622,30 +622,21 @@ while running:
                 game_paused = not game_paused
 
 
-        # if bird is out of the bottom of the screen, reload the game (player has lost)
-        if bird.y + bird.height >= HEIGHT:
-            game_over = True
-            running = False # stop the game
-
-
-
     if not game_paused:
         # gravity is applied to the bird
         BIRD_VERTICAL_SPEED += GRAVITY
         # update the bird's position
         bird.y += BIRD_VERTICAL_SPEED
 
-        # Limit the bird's position...
-        # ... to the bottom
+        # Limit the bird's position to the top of the screen (bird can't go above the screen)
         if bird.y < 0:
             bird.y = 0
             BIRD_VERTICAL_SPEED = 0
         
-        # ... to the top
-        if bird.y > HEIGHT - 50 - bird.height:
-            bird.y > HEIGHT - 50 - bird.height
-            BIRD_VERTICAL_SPEED = 0
-
+        # If bird is out of the bottom of the screen, player has lost
+        if bird.y + bird.height >= HEIGHT:
+            bird.y = HEIGHT - bird.height  # so the bird doesn't "go down" the screen
+            game_over = True
 
         # If the last pipe has moved far enough to the left, a new one is created on the right
         if pipes[-1].x < WIDTH - PIPE_DISTANCE:
@@ -727,38 +718,38 @@ while running:
             back_to_menu_btn.handle_event(event)
 
 
+    if game_over:
+        # Ending screen
+        pygame.mixer.music.stop() # stop the game's music loop
+        game_over_sound.play() # play the game over sound
+
+        screen.fill((0, 0, 0)) # black background
+
+        # .get_rect() allows to get a rectangle around the text
+        #  then we just have to center it 
+
+        game_over_text = font_100.render("GAME OVER", True, (255, 0, 0))
+        game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
+        screen.blit(game_over_text, game_over_rect)
+
+        score_text = font_50.render(f"Score: {score}", True, (255, 255, 255))
+        score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(score_text, score_rect)
+
+        time_text = font_50.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
+        time_rect = time_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
+        screen.blit(time_text, time_rect)
+
+
+        pygame.display.flip()
+
+        # Wait 3 secondes before closing
+        time.sleep(3)
+
+        pygame.quit()
+
 
     # refresh the screen
     pygame.display.flip()
     # limits FPS to 60
     clock.tick(60)
-
-
-# Ending screen
-pygame.mixer.music.stop() # stop the game's music loop
-game_over_sound.play() # play the game over sound
-
-screen.fill((0, 0, 0)) # black background
-
-# .get_rect() allows to get a rectangle around the text
-#  then we just have to center it 
-
-game_over_text = font_100.render("GAME OVER", True, (255, 0, 0))
-game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
-screen.blit(game_over_text, game_over_rect)
-
-score_text = font_50.render(f"Score: {score}", True, (255, 255, 255))
-score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-screen.blit(score_text, score_rect)
-
-time_text = font_50.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
-time_rect = time_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
-screen.blit(time_text, time_rect)
-
-
-pygame.display.flip()
-
-# Wait 3 secondes before closing
-time.sleep(3)
-
-pygame.quit()
