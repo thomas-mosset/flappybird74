@@ -6,6 +6,7 @@ import time
 # initialization of pygame
 pygame.init()
 music_on = True
+game_over_played = False
 
 # fonts
 font_21 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 21)
@@ -32,6 +33,9 @@ title_music_menu_rect = title_music_menu_text.get_rect(center=(640, 150))
 title_pause_menu_text = font_40.render("PAUSE", True, (255, 255, 255))
 title_pause_menu_rect = title_pause_menu_text.get_rect(center=(640, 150))
 
+title_game_over_menu_text = font_30.render("GAME OVER", True, (255, 255, 255))
+title_game_over_menu_rect = title_game_over_menu_text.get_rect(center=(640, 150))
+
 number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
 number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
 
@@ -56,6 +60,7 @@ music_off_rect = music_off_text.get_rect(center=(710, 430))
 # screens
 countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
 base_menu_screen = pygame.image.load("assets/screens/base_menu_screen.png")
+base_game_over_screen = pygame.image.load("assets/screens/base_game_over_screen.png")
 
 # musics
 pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
@@ -160,7 +165,7 @@ pipe_images = {
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Flappy Bird 74")
+pygame.display.set_caption("Flappy Bird")
 
 # Bird's creation
 def create_pixel_bird():
@@ -358,7 +363,7 @@ def countdown():
 # reset game's values to initial state (use case : the player has already played once but has come back to the main menu - so their data and the game's state doesn't stay as their previous gameplay.)
 def reset_game():
     global bird, BIRD_VERTICAL_SPEED, score, pipes, coins, coin_timer, start_time
-    global game_over, game_paused, clouds
+    global game_over, game_paused, game_over_played, clouds
 
     # Reset bird position & speed
     bird.x = 150
@@ -380,6 +385,7 @@ def reset_game():
     # Reset game state flags
     game_over = False
     game_paused = False
+    game_over_played = False
 
 
 def start_game():
@@ -447,6 +453,8 @@ headphone_btn = Button(resized_params_menu_headphone_btn, (640, 300), "", font_2
 gamestick_btn = Button(resized_params_menu_gamestick_btn, (640, 435), "", font_26, go_to_controls_menu)
 resume_game_btn = Button(resized_menu_btn, (640, 345), "RESUME", font_21, resume_game)
 back_to_menu_btn = Button(resized_menu_btn, (640, 470), "MENU", font_21, go_back_to_main_menu)
+play_game_over_btn = Button(resized_menu_btn, (520, 545), "PLAY", font_21, start_game)
+back_to_menu_game_over_btn = Button(resized_menu_btn, (760, 545), "MENU", font_21, go_back_to_main_menu)
 
 # it's just an img not a btn so we use get_rect()
 resized_music_menu_img_rect = resized_music_menu_img.get_rect(center=(640, 330))
@@ -466,6 +474,10 @@ clouds = [Cloud() for _ in range(4)]
 
 # Create the pipes
 pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)] # Create 3 pipes initially, spaced by PIPE_DISTANCE, off screen to the right
+
+
+# Calculate timer
+elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
 
 # main loop
 while running:
@@ -649,7 +661,6 @@ while running:
             # if one of the pipes collide with the bird, we stop the game
             if pipe.collides_with(bird):
                 game_over = True
-                running = False
 
 
         # coins spawn management
@@ -677,19 +688,17 @@ while running:
             else:
                 coins.remove(coin) # Remove inactive coins
 
-        # Timer
-        # Calculate timer
-        elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
 
-        # Display timer
-        timer_text = font_26.render(f"Time: {elapsed_time}s", True, BLACK)
-        screen.blit(timer_text, (60, 19)) # Position at the top
-        screen.blit(timer_img, (20, 15))
+            # Timer
+            # Display timer
+            timer_text = font_26.render(f"Time: {elapsed_time}s", True, BLACK)
+            screen.blit(timer_text, (60, 19)) # Position at the top
+            screen.blit(timer_img, (20, 15))
 
-        # Display score
-        score_text = font_26.render(f"Score: {score}", True, BLACK)
-        screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
-        screen.blit(trophy_img, (20, 50))
+            # Display score
+            score_text = font_26.render(f"Score: {score}", True, BLACK)
+            screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
+            screen.blit(trophy_img, (20, 50))
 
 
         # Bird on screen
@@ -719,34 +728,37 @@ while running:
 
 
     if game_over:
-        # Ending screen
-        pygame.mixer.music.stop() # stop the game's music loop
-        game_over_sound.play() # play the game over sound
+        # GAME OVER MENU
+        if not game_over_played:
+            pygame.mixer.music.stop() # stop the game's music loop
+            game_over_sound.play() # play the game over sound
+            game_over_played = True
 
-        screen.fill((0, 0, 0)) # black background
+        screen.blit(base_game_over_screen, (0, 0))
+        screen.blit(title_game_over_menu_text, title_game_over_menu_rect)
+        ### A VOIR SI GARDE ###
+        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
-        # .get_rect() allows to get a rectangle around the text
-        #  then we just have to center it 
-
-        game_over_text = font_100.render("GAME OVER", True, (255, 0, 0))
-        game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
-        screen.blit(game_over_text, game_over_rect)
-
-        score_text = font_50.render(f"Score: {score}", True, (255, 255, 255))
-        score_rect = score_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        score_text = font_26.render(f"Score: {score}", True, (0, 0, 0))
+        score_rect = score_text.get_rect(center=(700, 310))
         screen.blit(score_text, score_rect)
 
-        time_text = font_50.render(f"Time: {elapsed_time}s", True, (255, 255, 255))
-        time_rect = time_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 60))
+        time_text = font_26.render(f"Time: {elapsed_time}s", True, (0, 0, 0))
+        time_rect = time_text.get_rect(center=(700, 440))
         screen.blit(time_text, time_rect)
 
+        play_game_over_btn.draw(screen)
+        play_game_over_btn.handle_event(event)
 
-        pygame.display.flip()
+        back_to_menu_game_over_btn.draw(screen)
+        back_to_menu_game_over_btn.handle_event(event)
 
-        # Wait 3 secondes before closing
-        time.sleep(3)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-        pygame.quit()
+            play_game_over_btn.handle_event(event)
+            back_to_menu_game_over_btn.handle_event(event)
 
 
     # refresh the screen
