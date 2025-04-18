@@ -394,6 +394,10 @@ def start_game():
     reset_game() # Reset the game
     countdown() # Launch the beginning countdown
 
+    # Restart music if the option if activated
+    if music_on and not pygame.mixer.music.get_busy():
+        pygame.mixer.music.play(-1)
+
     elapsed_time = 0
     last_time_update = pygame.time.get_ticks()
 
@@ -601,6 +605,10 @@ while running:
                     if music_on_rect.collidepoint(event.pos):
                         music_on = True
                         pygame.mixer.music.set_volume(0.5)  # activate music
+
+                        if not pygame.mixer.music.get_busy():  # if the music is not played
+                            pygame.mixer.music.play(-1) # we start the music
+
                     elif music_off_rect.collidepoint(event.pos):
                         music_on = False
                         pygame.mixer.music.set_volume(0.0)  # turn off music
