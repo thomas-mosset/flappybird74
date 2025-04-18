@@ -389,10 +389,16 @@ def reset_game():
 
 
 def start_game():
+    global game_started, elapsed_time, last_time_update
+    
     reset_game() # Reset the game
     countdown() # Launch the beginning countdown
-    global game_started
+
+    elapsed_time = 0
+    last_time_update = pygame.time.get_ticks()
+
     game_started = True  # game starts after the countdown
+
 
 def quit_game():
     global game_started
@@ -477,10 +483,21 @@ pipes = [Pipe(WIDTH + i * PIPE_DISTANCE) for i in range(3)] # Create 3 pipes ini
 
 
 # Calculate timer
-elapsed_time = (pygame.time.get_ticks() - start_time) // 1000 # Convert milliseconds to seconds
+elapsed_time = 0
+last_time_update = None  # we wait the begining of the game to initialize it
 
 # main loop
 while running:
+    # Timer only runs when game is active (not paused or over)
+    if not game_paused and not game_over and game_started:
+        current_time = pygame.time.get_ticks()
+        delta = (current_time - last_time_update) / 1000.0  # Convert to seconds
+        elapsed_time += delta
+        last_time_update = current_time
+    elif game_started and (game_paused or game_over):
+        # if the game is on pause or over, we do not update elapsed_time
+        # we stock it for the time where the player will resume the game
+        last_time_update = pygame.time.get_ticks()
 
     if not game_started:
         if main_menu:
@@ -689,16 +706,25 @@ while running:
                 coins.remove(coin) # Remove inactive coins
 
 
-            # Timer
-            # Display timer
-            timer_text = font_26.render(f"Time: {elapsed_time}s", True, BLACK)
-            screen.blit(timer_text, (60, 19)) # Position at the top
-            screen.blit(timer_img, (20, 15))
+        # Timer
+        # Display timer
 
-            # Display score
-            score_text = font_26.render(f"Score: {score}", True, BLACK)
-            screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
-            screen.blit(trophy_img, (20, 50))
+        # Force elapsed_time to be an int
+        elapsed_seconds = int(elapsed_time)
+
+        # convert it to minutes and seconds
+        minutes = elapsed_seconds // 60
+        seconds = elapsed_seconds % 60
+
+        # display it
+        timer_text = font_26.render(f"Time: {minutes:02}m {seconds:02}s", True, BLACK)
+        screen.blit(timer_text, (60, 19)) # Position at the top
+        screen.blit(timer_img, (20, 15))
+
+        # Display score
+        score_text = font_26.render(f"Score: {score}", True, BLACK)
+        screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
+        screen.blit(trophy_img, (20, 50))
 
 
         # Bird on screen
@@ -736,16 +762,23 @@ while running:
 
         screen.blit(base_game_over_screen, (0, 0))
         screen.blit(title_game_over_menu_text, title_game_over_menu_rect)
-        ### A VOIR SI GARDE ###
         screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
         score_text = font_26.render(f"Score: {score}", True, (0, 0, 0))
         score_rect = score_text.get_rect(center=(700, 310))
         screen.blit(score_text, score_rect)
 
-        time_text = font_26.render(f"Time: {elapsed_time}s", True, (0, 0, 0))
-        time_rect = time_text.get_rect(center=(700, 440))
-        screen.blit(time_text, time_rect)
+        # Force elapsed_time to be an int
+        elapsed_seconds = int(elapsed_time)
+
+        # convert it to minutes and seconds
+        minutes = elapsed_seconds // 60
+        seconds = elapsed_seconds % 60
+
+        # display it
+        timer_text = font_26.render(f"Time: {minutes:02}m{seconds:02}s", True, BLACK)
+        timer_rect = timer_text.get_rect(center=(700, 440))
+        screen.blit(timer_text, timer_rect)
 
         play_game_over_btn.draw(screen)
         play_game_over_btn.handle_event(event)
