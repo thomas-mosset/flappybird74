@@ -5,11 +5,13 @@ import time
 
 
 from constants import *
+from assets import load_images
 
 # initialization of pygame
 pygame.init()
 music_on = True
 game_over_played = False
+
 
 # fonts
 font_21 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 21)
@@ -417,39 +419,27 @@ def go_back_to_main_menu():
     game_paused = False
 
 
-# screens / menus assets
-## Load btn images
-menu_btn = pygame.image.load("assets/screens/screens_elements/menu_button.png").convert_alpha()
-menu_params_btn = pygame.image.load("assets/screens/screens_elements/menu_params.png").convert_alpha()
-params_menu_headphone_btn = pygame.image.load("assets/screens/screens_elements/params_headphone.png").convert_alpha()
-params_menu_gamestick_btn = pygame.image.load("assets/screens/screens_elements/params_gamestick.png").convert_alpha()
-music_menu_img = pygame.image.load("assets/screens/screens_elements/params_music_note.png").convert_alpha()
-
-## resize btn images
-resized_menu_btn = pygame.transform.scale(menu_btn, (200, 80))
-resized_menu_params_btn = pygame.transform.scale(menu_params_btn, (135, 135))
-resized_params_menu_headphone_btn = pygame.transform.scale(params_menu_headphone_btn, (125, 125))
-resized_params_menu_gamestick_btn = pygame.transform.scale(params_menu_gamestick_btn, (125, 125))
-resized_music_menu_img = pygame.transform.scale(music_menu_img, (100, 100))
+### Load assets
+assets = load_images()
 
 # Create btns
-start_menu_btn = Button(resized_menu_btn, (640, 300), "START", font_26, start_game)
-params_menu_btn = Button(resized_menu_params_btn, (640, 425), "", font_26, go_to_params_menu)
-quit_menu_btn = Button(resized_menu_btn, (640, 550), "QUIT", font_26, quit_game)
-headphone_btn = Button(resized_params_menu_headphone_btn, (640, 300), "", font_26, go_to_music_menu)
-gamestick_btn = Button(resized_params_menu_gamestick_btn, (640, 435), "", font_26, go_to_controls_menu)
-resume_game_btn = Button(resized_menu_btn, (640, 345), "RESUME", font_21, resume_game)
-back_to_menu_btn = Button(resized_menu_btn, (640, 470), "MENU", font_21, go_back_to_main_menu)
-play_game_over_btn = Button(resized_menu_btn, (520, 545), "PLAY", font_21, start_game)
-back_to_menu_game_over_btn = Button(resized_menu_btn, (760, 545), "MENU", font_21, go_back_to_main_menu)
+start_menu_btn = Button(assets["resized_menu_btn"], (640, 300), "START", font_26, start_game)
+params_menu_btn = Button(assets["resized_menu_params_btn"], (640, 425), "", font_26, go_to_params_menu)
+quit_menu_btn = Button(assets["resized_menu_btn"], (640, 550), "QUIT", font_26, quit_game)
+headphone_btn = Button(assets["resized_params_menu_headphone_btn"], (640, 300), "", font_26, go_to_music_menu)
+gamestick_btn = Button(assets["resized_params_menu_gamestick_btn"], (640, 435), "", font_26, go_to_controls_menu)
+resume_game_btn = Button(assets["resized_menu_btn"], (640, 345), "RESUME", font_21, resume_game)
+back_to_menu_btn = Button(assets["resized_menu_btn"], (640, 470), "MENU", font_21, go_back_to_main_menu)
+play_game_over_btn = Button(assets["resized_menu_btn"], (520, 545), "PLAY", font_21, start_game)
+back_to_menu_game_over_btn = Button(assets["resized_menu_btn"], (760, 545), "MENU", font_21, go_back_to_main_menu)
 
 # it's just an img not a btn so we use get_rect()
-resized_music_menu_img_rect = resized_music_menu_img.get_rect(center=(640, 330))
+resized_music_menu_img_rect = assets["resized_music_menu_img"].get_rect(center=(640, 330))
 
 # reusable go back btn 
 def create_back_button(current_menu, previous_menu):
     return Button(
-        resized_menu_btn,
+        assets["resized_menu_btn"],
         (640, 550),
         "BACK",
         font_26,
@@ -561,7 +551,7 @@ while running:
             # MUSIC MENU
             screen.blit(base_menu_screen, (0, 0))
             screen.blit(title_music_menu_text, title_music_menu_rect)
-            screen.blit(resized_music_menu_img, resized_music_menu_img_rect)
+            screen.blit(assets["resized_music_menu_img"], resized_music_menu_img_rect)
 
             screen.blit(music_on_text, music_on_rect)
             screen.blit(music_off_text, music_off_rect)
