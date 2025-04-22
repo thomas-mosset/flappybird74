@@ -5,7 +5,7 @@ import time
 
 
 from constants import *
-from assets import load_images
+from assets import load_buttons, load_sounds_and_music
 
 # initialization of pygame
 pygame.init()
@@ -67,17 +67,8 @@ countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
 base_menu_screen = pygame.image.load("assets/screens/base_menu_screen.png")
 base_game_over_screen = pygame.image.load("assets/screens/base_game_over_screen.png")
 
-# musics
-pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
-pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
-pygame.mixer.music.play(-1) # -1 = infinite loop
 
-# sounds
-game_over_sound = pygame.mixer.Sound("assets/sounds/game_over.mp3")
-game_over_sound.set_volume(0.5)
-
-coin_touched_sound = pygame.mixer.Sound("assets/sounds/coin_touched.mp3")
-coin_touched_sound.set_volume(0.2)
+sounds_and_music = load_sounds_and_music()
 
 # initialization of the timer (in milliseconds)
 start_time = pygame.time.get_ticks()
@@ -305,7 +296,7 @@ def check_coin_collision():
                 coin.touched = True
                 coin.scored = True
                 score += coin.value
-                coin_touched_sound.play()
+                sounds_and_music["coin_touched_sound"].play()
 
 
 def draw_mountains():
@@ -420,7 +411,7 @@ def go_back_to_main_menu():
 
 
 ### Load assets
-assets = load_images()
+assets = load_buttons()
 
 # Create btns
 start_menu_btn = Button(assets["resized_menu_btn"], (640, 300), "START", font_26, start_game)
@@ -732,7 +723,7 @@ while running:
         # GAME OVER MENU
         if not game_over_played:
             pygame.mixer.music.stop() # stop the game's music loop
-            game_over_sound.play() # play the game over sound
+            sounds_and_music["game_over_sound"].play() # play the game over sound
             game_over_played = True
 
         screen.blit(base_game_over_screen, (0, 0))

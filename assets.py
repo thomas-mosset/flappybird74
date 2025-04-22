@@ -29,3 +29,23 @@ def load_buttons():
 
     return assets
 
+
+def load_sounds_and_music():
+    """Loads all sounds needed by the game."""
+    sounds_and_music = {}
+
+    # musics
+    pygame.mixer.music.load("assets/musics/POL-magical-sun-short.wav")
+    pygame.mixer.music.set_volume(0.5) # volume goes from 0.0 to 1.0
+    pygame.mixer.music.play(-1) # -1 = infinite loop
+
+    # sounds
+    sounds_and_music["game_over_sound"] = pygame.mixer.Sound("assets/sounds/game_over.mp3")
+
+    sounds_and_music["coin_touched_sound"] = pygame.mixer.Sound("assets/sounds/coin_touched.mp3")
+
+    # define sounds volume
+    sounds_and_music["game_over_sound"].set_volume(0.5)
+    sounds_and_music["coin_touched_sound"].set_volume(0.2)
+
+    return sounds_and_music
