@@ -49,3 +49,19 @@ def load_sounds_and_music():
     sounds_and_music["coin_touched_sound"].set_volume(0.2)
 
     return sounds_and_music
+
+
+
+def load_fonts():
+    """Loads all fonts needed by the game."""
+    fonts = {}
+
+    fonts["font_21"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 21)
+    fonts["font_26"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
+    fonts["font_30"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 30)
+    fonts["font_40"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 40)
+    fonts["font_50"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
+    fonts["font_80"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
+    fonts["font_100"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
+
+    return fonts

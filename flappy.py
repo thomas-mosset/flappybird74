@@ -5,7 +5,7 @@ import time
 
 
 from constants import *
-from assets import load_buttons, load_sounds_and_music
+from assets import load_buttons, load_sounds_and_music, load_fonts
 
 # initialization of pygame
 pygame.init()
@@ -14,13 +14,15 @@ game_over_played = False
 
 
 # fonts
-font_21 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 21)
-font_26 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 26)
-font_30 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 30)
-font_40 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 40)
-font_50 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 50)
-font_80 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 80)
-font_100 = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
+fonts = load_fonts()
+
+font_21 = fonts["font_21"]
+font_26 = fonts["font_26"]
+font_30 = fonts["font_30"]
+font_40 = fonts["font_40"]
+font_50 = fonts["font_50"]
+font_80 = fonts["font_80"]
+font_100 = fonts["font_100"]
 
 # menus titles
 title_main_menu_text = font_50.render("MENU", True, (255, 255, 255))
