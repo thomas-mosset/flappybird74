@@ -2,13 +2,15 @@
 import pygame
 import time
 
+# initialization of pygame
+pygame.init()
+
 from constants import *
 from assets import load_buttons, load_sounds_and_music, load_fonts, load_images
 from classes import Button, Pipe, Coin, Cloud
 from bird import bird_img, bird # bird.py
+from menu_static_titles import load_menu_static_titles, update_menu_music_texts
 
-# initialization of pygame
-pygame.init()
 music_on = True
 game_over_played = False
 
@@ -23,46 +25,8 @@ font_50 = fonts["font_50"]
 font_80 = fonts["font_80"]
 font_100 = fonts["font_100"]
 
-# menus static titles
-title_main_menu_text = font_50.render("MENU", True, (255, 255, 255))
-title_main_menu_rect = title_main_menu_text.get_rect(center=(640, 150))
-
-title_params_menu_text = font_40.render("PARAMS", True, (255, 255, 255))
-title_params_menu_rect = title_params_menu_text.get_rect(center=(640, 150))
-
-title_controls_menu_text = font_30.render("CONTROLS", True, (255, 255, 255))
-title_controls_menu_rect = title_controls_menu_text.get_rect(center=(640, 150))
-
-title_music_menu_text = font_40.render("MUSIC", True, (255, 255, 255))
-title_music_menu_rect = title_music_menu_text.get_rect(center=(640, 150))
-
-title_pause_menu_text = font_40.render("PAUSE", True, (255, 255, 255))
-title_pause_menu_rect = title_pause_menu_text.get_rect(center=(640, 150))
-
-title_game_over_menu_text = font_30.render("GAME OVER", True, (255, 255, 255))
-title_game_over_menu_rect = title_game_over_menu_text.get_rect(center=(640, 150))
-
-number_version_main_menu_text = font_26.render("v.2", True, (0, 0, 0))
-number_version_main_menu_rect = number_version_main_menu_text.get_rect(center=(640, 630))
-
-jump_title_controls_menu_text = font_26.render("Jump", True, (116, 160, 80)) # green
-jump_title_controls_menu_rect = jump_title_controls_menu_text.get_rect(center=(640, 290))
-
-jump_keys_controls_menu_text = font_26.render("up & space", True, (0, 0, 0))
-jump_keys_controls_menu_rect = jump_keys_controls_menu_text.get_rect(center=(640, 330))
-
-pause_title_controls_menu_text = font_26.render("Pause", True, (116, 160, 80)) # green
-pause_title_controls_menu_rect = pause_title_controls_menu_text.get_rect(center=(640, 410))
-
-pause_keys_controls_menu_text = font_26.render("escape", True, (0, 0, 0))
-pause_keys_controls_menu_rect = pause_keys_controls_menu_text.get_rect(center=(640, 450))
-
-music_on_text = font_26.render("ON", True, (116, 160, 80) if music_on else (0, 0, 0))
-music_on_rect = music_on_text.get_rect(center=(570, 430))
-
-music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
-music_off_rect = music_off_text.get_rect(center=(710, 430))
-
+# load menus static titles
+menu_static_titles = load_menu_static_titles()
 
 images = load_images()
 sounds_and_music = load_sounds_and_music()
@@ -120,7 +84,7 @@ def draw_grass():
 def countdown():
     global game_started
 
-    for i in range(3, 0, -1): ###
+    for i in range(3, 0, -1):
         screen.blit(images["screens"]["countdown_screen"], (0, 0))
         text = font_100.render(str(i), True, BLACK)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
@@ -220,7 +184,7 @@ def go_back_to_main_menu():
     game_paused = False
 
 
-### Load assets
+# Load assets
 assets = load_buttons()
 
 # Create btns
@@ -274,8 +238,8 @@ while running:
         if main_menu:
             # MAIN MENU
             screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(title_main_menu_text, title_main_menu_rect) 
-            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+            screen.blit(menu_static_titles["title_main_menu_text"], menu_static_titles["title_main_menu_rect"]) 
+            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
 
             start_menu_btn.draw(screen)
             params_menu_btn.draw(screen)
@@ -296,8 +260,8 @@ while running:
         elif params_menu:
             # PARAMS MENU
             screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(title_params_menu_text, title_params_menu_rect) 
-            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+            screen.blit(menu_static_titles["title_params_menu_text"], menu_static_titles["title_params_menu_rect"]) 
+            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
 
             # create_back_button("current_menu", "previous_menu")
             back_btn = create_back_button("params_menu", "main_menu")
@@ -321,12 +285,12 @@ while running:
         elif controls_menu:
             # CONTROLS MENU
             screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(title_controls_menu_text, title_controls_menu_rect)
-            screen.blit(jump_title_controls_menu_text, jump_title_controls_menu_rect)
-            screen.blit(jump_keys_controls_menu_text, jump_keys_controls_menu_rect)
-            screen.blit(pause_title_controls_menu_text, pause_title_controls_menu_rect)
-            screen.blit(pause_keys_controls_menu_text, pause_keys_controls_menu_rect)
-            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+            screen.blit(menu_static_titles["title_controls_menu_text"], menu_static_titles["title_controls_menu_rect"])
+            screen.blit(menu_static_titles["jump_title_controls_menu_text"], menu_static_titles["jump_title_controls_menu_rect"])
+            screen.blit(menu_static_titles["jump_keys_controls_menu_text"], menu_static_titles["jump_keys_controls_menu_rect"])
+            screen.blit(menu_static_titles["pause_title_controls_menu_text"], menu_static_titles["pause_title_controls_menu_rect"])
+            screen.blit(menu_static_titles["pause_keys_controls_menu_text"], menu_static_titles["pause_keys_controls_menu_rect"])
+            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
             
             # create_back_button("current_menu", "previous_menu")
             back_btn = create_back_button("controls_menu", "params_menu")
@@ -345,18 +309,20 @@ while running:
 
 
         elif music_menu:
-            music_on_text = font_26.render("ON", True, (116, 160, 80) if music_on else (0, 0, 0))
-            music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
+            # Get the ON / OFF text with proper colors
+            music_on_text, music_on_rect, music_off_text, music_off_rect = update_menu_music_texts(music_on)
 
-            # MUSIC MENU
+            # DISPLAY MUSIC MENU
             screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(title_music_menu_text, title_music_menu_rect)
+            screen.blit(menu_static_titles["title_music_menu_text"], menu_static_titles["title_music_menu_rect"])
             screen.blit(assets["resized_music_menu_img"], resized_music_menu_img_rect)
 
+            # Display texts "ON" / "OFF" for the music
             screen.blit(music_on_text, music_on_rect)
             screen.blit(music_off_text, music_off_rect)
 
-            screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+            # Display game's version
+            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
             
             # create_back_button("current_menu", "previous_menu")
             back_btn = create_back_button("music_menu", "params_menu")
@@ -391,7 +357,6 @@ while running:
     screen.fill(SKY_BLUE) # blue sky
     draw_mountains()
     draw_grass()
-
 
     for cloud in clouds:
         cloud.move()
@@ -511,8 +476,8 @@ while running:
     if game_paused:
         # PAUSE MENU
         screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-        screen.blit(title_pause_menu_text, title_pause_menu_rect) 
-        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+        screen.blit(menu_static_titles["title_pause_menu_text"], menu_static_titles["title_pause_menu_rect"]) 
+        screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
 
         resume_game_btn.draw(screen)
         resume_game_btn.handle_event(event)
@@ -536,8 +501,8 @@ while running:
             game_over_played = True
 
         screen.blit(images["screens"]["base_game_over_screen"], (0, 0))
-        screen.blit(title_game_over_menu_text, title_game_over_menu_rect)
-        screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
+        screen.blit(menu_static_titles["title_game_over_menu_text"], menu_static_titles["title_game_over_menu_rect"])
+        screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
 
         score_text = font_26.render(f"Score: {score}", True, (0, 0, 0))
         score_rect = score_text.get_rect(center=(700, 310))
