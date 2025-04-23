@@ -119,4 +119,3 @@ def load_images():
         "background_elements": background_elements,
         "screens": screens
     }
-
