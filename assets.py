@@ -65,3 +65,58 @@ def load_fonts():
     fonts["font_100"] = pygame.font.Font("assets/fonts/PressStart2P-Regular.ttf", 100)
 
     return fonts
+
+
+def load_images():
+    """Loads all images needed by the game."""
+
+    # Load icons
+    timer_img = pygame.image.load("assets/icons/timer.bmp")
+    timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
+
+    trophy_img = pygame.image.load("assets/icons/trophy.bmp")
+    trophy_img = pygame.transform.scale(trophy_img, (30, 30))
+
+    # Load coins
+    coin_images = {
+        1: pygame.image.load("assets/icons/1-coin-blue.bmp"),
+        2: pygame.image.load("assets/icons/2-coin-yellow.bmp"),
+        3: pygame.image.load("assets/icons/3-coin-orange.bmp"),
+        4: pygame.image.load("assets/icons/4-coin-pink.bmp"),
+        5: pygame.image.load("assets/icons/5-coin-star.bmp")
+    }
+
+    # Load pipes
+    pipe_images = {
+        "xs": pygame.image.load("assets/pipes/xs_pipe.bmp"),
+        "s": pygame.image.load("assets/pipes/s_pipe.bmp"),
+        "m": pygame.image.load("assets/pipes/m_pipe.bmp"),
+        "l": pygame.image.load("assets/pipes/l_pipe.bmp"),
+        "xl": pygame.image.load("assets/pipes/xl_pipe.bmp")
+    }
+
+    # Load background elements
+    background_elements = {
+        "grass_img": pygame.image.load("assets/background_elements/grass.bmp"),
+        "mountain_img": pygame.image.load("assets/background_elements/mountain.bmp"),
+        "cloud_img": pygame.image.load("assets/background_elements/cloud.bmp"),
+    }
+
+    # Load screens
+    screens = {
+        "countdown_screen": pygame.image.load("assets/screens/countdown_screen.png"),
+        "base_menu_screen": pygame.image.load("assets/screens/base_menu_screen.png"),
+        "base_game_over_screen": pygame.image.load("assets/screens/base_game_over_screen.png"),
+    }
+
+    return {
+        "icons": {
+            "timer_img": timer_img,
+            "trophy_img": trophy_img
+        },
+        "coins": coin_images,
+        "pipes": pipe_images,
+        "background_elements": background_elements,
+        "screens": screens
+    }
+

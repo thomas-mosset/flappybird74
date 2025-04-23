@@ -5,7 +5,7 @@ import time
 
 
 from constants import *
-from assets import load_buttons, load_sounds_and_music, load_fonts
+from assets import load_buttons, load_sounds_and_music, load_fonts, load_images
 
 # initialization of pygame
 pygame.init()
@@ -64,12 +64,8 @@ music_on_rect = music_on_text.get_rect(center=(570, 430))
 music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
 music_off_rect = music_off_text.get_rect(center=(710, 430))
 
-# screens
-countdown_screen = pygame.image.load("assets/screens/countdown_screen.png")
-base_menu_screen = pygame.image.load("assets/screens/base_menu_screen.png")
-base_game_over_screen = pygame.image.load("assets/screens/base_game_over_screen.png")
 
-
+images = load_images()
 sounds_and_music = load_sounds_and_music()
 
 # initialization of the timer (in milliseconds)
@@ -92,48 +88,6 @@ main_menu = True
 params_menu = False
 music_menu = False
 controls_menu = False
-
-
-# game's images / icons
-timer_img = pygame.image.load("assets/icons/timer.bmp")
-timer_img = pygame.transform.scale(timer_img, (30, 30))  # Resize it
-
-trophy_img = pygame.image.load("assets/icons/trophy.bmp")
-trophy_img = pygame.transform.scale(trophy_img, (30, 30))
-
-grass_img = pygame.image.load("assets/background_elements/grass.bmp")
-mountain_img = pygame.image.load("assets/background_elements/mountain.bmp")
-cloud_img = pygame.image.load("assets/background_elements/cloud.bmp")
-
-blue_coin_1_img = pygame.image.load("assets/icons/1-coin-blue.bmp")
-yellow_coin_2_img = pygame.image.load("assets/icons/2-coin-yellow.bmp")
-orange_coin_3_img = pygame.image.load("assets/icons/3-coin-orange.bmp")
-pink_coin_4_img = pygame.image.load("assets/icons/4-coin-pink.bmp")
-star_coin_5_img = pygame.image.load("assets/icons/5-coin-star.bmp")
-
-# dictionary to group coin img
-coin_images = {
-    1: blue_coin_1_img,
-    2: yellow_coin_2_img,
-    3: orange_coin_3_img,
-    4: pink_coin_4_img,
-    5: star_coin_5_img
-}
-
-xs_pipe_img = pygame.image.load("assets/pipes/xs_pipe.bmp")
-s_pipe_img = pygame.image.load("assets/pipes/s_pipe.bmp")
-m_pipe_img = pygame.image.load("assets/pipes/m_pipe.bmp")
-l_pipe_img = pygame.image.load("assets/pipes/l_pipe.bmp")
-xl_pipe_img = pygame.image.load("assets/pipes/xl_pipe.bmp")
-
-# dictionary to group pipes img
-pipe_images = {
-    "xs": xs_pipe_img,
-    "s": s_pipe_img,
-    "m": m_pipe_img,
-    "l": l_pipe_img,
-    "xl": xl_pipe_img
-}
 
 # screen creation
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -183,8 +137,8 @@ class Button:
 # Pipe's collision
 class Pipe:
     def __init__(self, x):
-        self.size = random.choice(list(pipe_images.keys())) # get a random size trough the dictionary's keys
-        self.image = pipe_images[self.size] # get the image corresponding to the key
+        self.size = random.choice(list(images["pipes"].keys())) # get a random size trough the dictionary's keys
+        self.image = images["pipes"][self.size] # get the image corresponding to the key
         self.width = self.image.get_width()
         self.height = self.image.get_height()
         self.x = x # initial position on the X axis on the pipe's creation
@@ -223,11 +177,11 @@ class Coin:
         
         # assign values to icons
         self.image = {
-            1: blue_coin_1_img,
-            2: yellow_coin_2_img,
-            3: orange_coin_3_img,
-            4: pink_coin_4_img,
-            5: star_coin_5_img
+            1: images["coins"][1],
+            2: images["coins"][2],
+            3: images["coins"][3],
+            4: images["coins"][4],
+            5: images["coins"][5]
         }[self.value]
 
         # Resize the coin
@@ -273,9 +227,9 @@ class Cloud:
         self.y = random.randint(5, 80) # cloud is random height level
         self.speed = random.uniform(0.5, 1.5) # each cloud will have a random speed
         self.scale = random.uniform(0.2, 0.9) # each cloud will have a different size
-        self.image = pygame.transform.scale(cloud_img, ( # resize the cloud while keeping its scale
-            int(cloud_img.get_width() * self.scale),
-            int(cloud_img.get_height() * self.scale)
+        self.image = pygame.transform.scale(images["background_elements"]["cloud_img"], ( # resize the cloud while keeping its scale
+            int(images["background_elements"]["cloud_img"].get_width() * self.scale),
+            int(images["background_elements"]["cloud_img"].get_height() * self.scale)
         ))
     
     def move(self):
@@ -302,18 +256,18 @@ def check_coin_collision():
 
 
 def draw_mountains():
-    screen.blit(mountain_img, (0, HEIGHT - mountain_img.get_height()))
+    screen.blit(images["background_elements"]["mountain_img"], (0, HEIGHT - images["background_elements"]["mountain_img"].get_height()))
 
 
 def draw_grass():
-    screen.blit(grass_img, (0, HEIGHT - grass_img.get_height()))
+    screen.blit(images["background_elements"]["grass_img"], (0, HEIGHT - images["background_elements"]["grass_img"].get_height()))
 
 
 def countdown():
     global game_started
 
-    for i in range(3, 0, -1):
-        screen.blit(countdown_screen, (0, 0))
+    for i in range(3, 0, -1): ###
+        screen.blit(images["screens"]["countdown_screen"], (0, 0))
         text = font_100.render(str(i), True, BLACK)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(text, text_rect)
@@ -321,7 +275,7 @@ def countdown():
         time.sleep(1) # wait 1 sec between each number display
     
     # Display "GO!"
-    screen.blit(countdown_screen, (0, 0))
+    screen.blit(images["screens"]["countdown_screen"], (0, 0))
     text = font_100.render("GO!", True, BLACK)
     go_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
     screen.blit(text, go_rect)
@@ -466,7 +420,7 @@ while running:
     if not game_started:
         if main_menu:
             # MAIN MENU
-            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
             screen.blit(title_main_menu_text, title_main_menu_rect) 
             screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
@@ -488,7 +442,7 @@ while running:
 
         elif params_menu:
             # PARAMS MENU
-            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
             screen.blit(title_params_menu_text, title_params_menu_rect) 
             screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
@@ -513,7 +467,7 @@ while running:
 
         elif controls_menu:
             # CONTROLS MENU
-            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
             screen.blit(title_controls_menu_text, title_controls_menu_rect)
             screen.blit(jump_title_controls_menu_text, jump_title_controls_menu_rect)
             screen.blit(jump_keys_controls_menu_text, jump_keys_controls_menu_rect)
@@ -542,7 +496,7 @@ while running:
             music_off_text = font_26.render("OFF", True, (116, 160, 80) if not music_on else (0, 0, 0))
 
             # MUSIC MENU
-            screen.blit(base_menu_screen, (0, 0))
+            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
             screen.blit(title_music_menu_text, title_music_menu_rect)
             screen.blit(assets["resized_music_menu_img"], resized_music_menu_img_rect)
 
@@ -687,12 +641,12 @@ while running:
         # display it
         timer_text = font_26.render(f"Time: {minutes:02}m {seconds:02}s", True, BLACK)
         screen.blit(timer_text, (60, 19)) # Position at the top
-        screen.blit(timer_img, (20, 15))
+        screen.blit(images["icons"]["timer_img"], (20, 15))
 
         # Display score
         score_text = font_26.render(f"Score: {score}", True, BLACK)
         screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
-        screen.blit(trophy_img, (20, 50))
+        screen.blit(images["icons"]["trophy_img"], (20, 50))
 
 
         # Bird on screen
@@ -703,7 +657,7 @@ while running:
     # if game is paused / Pause screen
     if game_paused:
         # PAUSE MENU
-        screen.blit(base_menu_screen, (0, 0))
+        screen.blit(images["screens"]["base_menu_screen"], (0, 0))
         screen.blit(title_pause_menu_text, title_pause_menu_rect) 
         screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
@@ -728,7 +682,7 @@ while running:
             sounds_and_music["game_over_sound"].play() # play the game over sound
             game_over_played = True
 
-        screen.blit(base_game_over_screen, (0, 0))
+        screen.blit(images["screens"]["base_game_over_screen"], (0, 0))
         screen.blit(title_game_over_menu_text, title_game_over_menu_rect)
         screen.blit(number_version_main_menu_text, number_version_main_menu_rect)
 
