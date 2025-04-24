@@ -104,6 +104,200 @@ def countdown():
     game_started = True  # Start the game after countdown
 
 
+def handle_main_menu():
+    """handle the main menu of the game."""
+
+    screen.blit(images["screens"]["base_menu_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_main_menu_text"], menu_static_titles["title_main_menu_rect"]) 
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+
+    start_menu_btn.draw(screen)
+    params_menu_btn.draw(screen)
+    quit_menu_btn.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+            running = False
+        start_menu_btn.handle_event(event)
+        params_menu_btn.handle_event(event)
+        quit_menu_btn.handle_event(event)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+
+def handle_params_menu():
+    """handle the params menu of the game."""
+
+    screen.blit(images["screens"]["base_menu_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_params_menu_text"], menu_static_titles["title_params_menu_rect"]) 
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+
+    # create_back_button("current_menu", "previous_menu")
+    back_btn = create_back_button("params_menu", "main_menu")
+
+    headphone_btn.draw(screen)
+    gamestick_btn.draw(screen)
+    back_btn.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+            running = False
+        headphone_btn.handle_event(event)
+        gamestick_btn.handle_event(event)
+        back_btn.handle_event(event)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+
+def handle_controls_menu():
+    """handle the controls menu of the game."""
+
+    screen.blit(images["screens"]["base_menu_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_controls_menu_text"], menu_static_titles["title_controls_menu_rect"])
+    screen.blit(menu_static_titles["jump_title_controls_menu_text"], menu_static_titles["jump_title_controls_menu_rect"])
+    screen.blit(menu_static_titles["jump_keys_controls_menu_text"], menu_static_titles["jump_keys_controls_menu_rect"])
+    screen.blit(menu_static_titles["pause_title_controls_menu_text"], menu_static_titles["pause_title_controls_menu_rect"])
+    screen.blit(menu_static_titles["pause_keys_controls_menu_text"], menu_static_titles["pause_keys_controls_menu_rect"])
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+    
+    # create_back_button("current_menu", "previous_menu")
+    back_btn = create_back_button("controls_menu", "params_menu")
+    # draw it on screen
+    back_btn.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+            running = False
+        back_btn.handle_event(event)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+
+def handle_music_menu(music_on):
+    """handle the music menu of the game."""
+
+    # Get the ON / OFF text with proper colors
+    music_on_text, music_on_rect, music_off_text, music_off_rect = update_menu_music_texts(music_on)
+
+    # DISPLAY MUSIC MENU
+    screen.blit(images["screens"]["base_menu_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_music_menu_text"], menu_static_titles["title_music_menu_rect"])
+    screen.blit(assets["resized_music_menu_img"], resized_music_menu_img_rect)
+
+    # Display texts "ON" / "OFF" for the music
+    screen.blit(music_on_text, music_on_rect)
+    screen.blit(music_off_text, music_off_rect)
+
+    # Display game's version
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+    
+    # create_back_button("current_menu", "previous_menu")
+    back_btn = create_back_button("music_menu", "params_menu")
+    # draw it on screen
+    back_btn.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+            running = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN: # check it click event
+            if music_on_rect.collidepoint(event.pos):
+                music_on = True
+                pygame.mixer.music.set_volume(0.5) # activate music
+
+                if not pygame.mixer.music.get_busy(): # if the music is not played
+                    pygame.mixer.music.play(-1) # we start the music
+
+                # update the text w/ correct colour
+                music_on_text, music_on_rect, music_off_text, music_off_rect = update_menu_music_texts(music_on)
+
+            elif music_off_rect.collidepoint(event.pos):
+                music_on = False
+                pygame.mixer.music.set_volume(0.0) # turn off music
+
+                # update the text w/ correct colour
+                music_on_text, music_on_rect, music_off_text, music_off_rect = update_menu_music_texts(music_on)
+
+        back_btn.handle_event(event)
+
+    pygame.display.flip()
+    clock.tick(60)
+    return music_on
+
+
+def handle_pause_menu(event):
+    """handle the pause menu of the game."""
+
+    screen.blit(images["screens"]["base_menu_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_pause_menu_text"], menu_static_titles["title_pause_menu_rect"]) 
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+
+    resume_game_btn.draw(screen)
+    resume_game_btn.handle_event(event)
+
+    back_to_menu_btn.draw(screen)
+    back_to_menu_btn.handle_event(event)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        resume_game_btn.handle_event(event)
+        back_to_menu_btn.handle_event(event)
+
+
+def handle_game_over_menu(event):
+    """handle the game over menu of the game."""
+
+    global game_over_played
+
+    if not game_over_played:
+        pygame.mixer.music.stop() # stop the game's music loop
+        sounds_and_music["game_over_sound"].play() # play the game over sound
+        game_over_played = True
+
+    screen.blit(images["screens"]["base_game_over_screen"], (0, 0))
+    screen.blit(menu_static_titles["title_game_over_menu_text"], menu_static_titles["title_game_over_menu_rect"])
+    screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
+
+    score_text = font_26.render(f"Score: {score}", True, (0, 0, 0))
+    score_rect = score_text.get_rect(center=(700, 310))
+    screen.blit(score_text, score_rect)
+
+    # Force elapsed_time to be an int
+    elapsed_seconds = int(elapsed_time)
+
+    # convert it to minutes and seconds
+    minutes = elapsed_seconds // 60
+    seconds = elapsed_seconds % 60
+
+    # display it
+    timer_text = font_26.render(f"Time: {minutes:02}m{seconds:02}s", True, BLACK)
+    timer_rect = timer_text.get_rect(center=(700, 440))
+    screen.blit(timer_text, timer_rect)
+
+    play_game_over_btn.draw(screen)
+    play_game_over_btn.handle_event(event)
+
+    back_to_menu_game_over_btn.draw(screen)
+    back_to_menu_game_over_btn.handle_event(event)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        play_game_over_btn.handle_event(event)
+        back_to_menu_game_over_btn.handle_event(event)
+
+
+
 # reset game's values to initial state (use case : the player has already played once but has come back to the main menu - so their data and the game's state doesn't stay as their previous gameplay.)
 def reset_game():
     global bird, BIRD_VERTICAL_SPEED, score, pipes, coins, coin_timer, start_time
@@ -178,10 +372,14 @@ def go_to_controls_menu():
     controls_menu = True
 
 def go_back_to_main_menu():
-    global main_menu, game_started, game_paused
+    global main_menu, game_started, game_paused, music_on
     game_started = False
     main_menu = True
     game_paused = False
+
+    # Start again the music if the option is activated vy the player
+    if music_on and not pygame.mixer.music.get_busy():
+        pygame.mixer.music.play(-1)
 
 
 # Load assets
@@ -229,6 +427,7 @@ while running:
         delta = (current_time - last_time_update) / 1000.0  # Convert to seconds
         elapsed_time += delta
         last_time_update = current_time
+
     elif game_started and (game_paused or game_over):
         # if the game is on pause or over, we do not update elapsed_time
         # we stock it for the time where the player will resume the game
@@ -236,121 +435,20 @@ while running:
 
     if not game_started:
         if main_menu:
-            # MAIN MENU
-            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(menu_static_titles["title_main_menu_text"], menu_static_titles["title_main_menu_rect"]) 
-            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-
-            start_menu_btn.draw(screen)
-            params_menu_btn.draw(screen)
-            quit_menu_btn.draw(screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    game_over = True
-                    running = False
-                start_menu_btn.handle_event(event)
-                params_menu_btn.handle_event(event)
-                quit_menu_btn.handle_event(event)
-
-            pygame.display.flip()
-            clock.tick(60)
+            handle_main_menu()
             continue  # we skip the loop as long as the game has not begun
 
         elif params_menu:
-            # PARAMS MENU
-            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(menu_static_titles["title_params_menu_text"], menu_static_titles["title_params_menu_rect"]) 
-            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-
-            # create_back_button("current_menu", "previous_menu")
-            back_btn = create_back_button("params_menu", "main_menu")
-
-            headphone_btn.draw(screen)
-            gamestick_btn.draw(screen)
-            back_btn.draw(screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    game_over = True
-                    running = False
-                headphone_btn.handle_event(event)
-                gamestick_btn.handle_event(event)
-                back_btn.handle_event(event)
-
-            pygame.display.flip()
-            clock.tick(60)
+            handle_params_menu()
             continue  # we skip the loop as long as the game has not begun
 
         elif controls_menu:
-            # CONTROLS MENU
-            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(menu_static_titles["title_controls_menu_text"], menu_static_titles["title_controls_menu_rect"])
-            screen.blit(menu_static_titles["jump_title_controls_menu_text"], menu_static_titles["jump_title_controls_menu_rect"])
-            screen.blit(menu_static_titles["jump_keys_controls_menu_text"], menu_static_titles["jump_keys_controls_menu_rect"])
-            screen.blit(menu_static_titles["pause_title_controls_menu_text"], menu_static_titles["pause_title_controls_menu_rect"])
-            screen.blit(menu_static_titles["pause_keys_controls_menu_text"], menu_static_titles["pause_keys_controls_menu_rect"])
-            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-            
-            # create_back_button("current_menu", "previous_menu")
-            back_btn = create_back_button("controls_menu", "params_menu")
-            # draw it on screen
-            back_btn.draw(screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    game_over = True
-                    running = False
-                back_btn.handle_event(event)
-
-            pygame.display.flip()
-            clock.tick(60)
+            handle_controls_menu()
             continue  # we skip the loop as long as the game has not begun
-
 
         elif music_menu:
-            # Get the ON / OFF text with proper colors
-            music_on_text, music_on_rect, music_off_text, music_off_rect = update_menu_music_texts(music_on)
-
-            # DISPLAY MUSIC MENU
-            screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-            screen.blit(menu_static_titles["title_music_menu_text"], menu_static_titles["title_music_menu_rect"])
-            screen.blit(assets["resized_music_menu_img"], resized_music_menu_img_rect)
-
-            # Display texts "ON" / "OFF" for the music
-            screen.blit(music_on_text, music_on_rect)
-            screen.blit(music_off_text, music_off_rect)
-
-            # Display game's version
-            screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-            
-            # create_back_button("current_menu", "previous_menu")
-            back_btn = create_back_button("music_menu", "params_menu")
-            # draw it on screen
-            back_btn.draw(screen)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    game_over = True
-                    running = False
-
-                elif event.type == pygame.MOUSEBUTTONDOWN: # check it click event
-                    if music_on_rect.collidepoint(event.pos):
-                        music_on = True
-                        pygame.mixer.music.set_volume(0.5)  # activate music
-
-                        if not pygame.mixer.music.get_busy():  # if the music is not played
-                            pygame.mixer.music.play(-1) # we start the music
-
-                    elif music_off_rect.collidepoint(event.pos):
-                        music_on = False
-                        pygame.mixer.music.set_volume(0.0)  # turn off music
-                back_btn.handle_event(event)
-
-            pygame.display.flip()
-            clock.tick(60)
+            music_on = handle_music_menu(music_on)
             continue  # we skip the loop as long as the game has not begun
-
 
 
     # fill the screen with a color
@@ -419,7 +517,6 @@ while running:
             if pipe.collides_with(bird):
                 game_over = True
 
-
         # coins spawn management
         coin_timer += 1
         if coin_timer >= COIN_SPAWN_TIME:
@@ -448,7 +545,6 @@ while running:
 
         # Timer
         # Display timer
-
         # Force elapsed_time to be an int
         elapsed_seconds = int(elapsed_time)
 
@@ -466,72 +562,15 @@ while running:
         screen.blit(score_text, (65, 55)) # Position at the top but slightly lower than the timer
         screen.blit(images["icons"]["trophy_img"], (20, 50))
 
-
         # Bird on screen
         screen.blit(bird_img, (bird.x, bird.y))
 
 
-       
-    # if game is paused / Pause screen
     if game_paused:
-        # PAUSE MENU
-        screen.blit(images["screens"]["base_menu_screen"], (0, 0))
-        screen.blit(menu_static_titles["title_pause_menu_text"], menu_static_titles["title_pause_menu_rect"]) 
-        screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-
-        resume_game_btn.draw(screen)
-        resume_game_btn.handle_event(event)
-
-        back_to_menu_btn.draw(screen)
-        back_to_menu_btn.handle_event(event)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            resume_game_btn.handle_event(event)
-            back_to_menu_btn.handle_event(event)
-
+        handle_pause_menu(event)
 
     if game_over:
-        # GAME OVER MENU
-        if not game_over_played:
-            pygame.mixer.music.stop() # stop the game's music loop
-            sounds_and_music["game_over_sound"].play() # play the game over sound
-            game_over_played = True
-
-        screen.blit(images["screens"]["base_game_over_screen"], (0, 0))
-        screen.blit(menu_static_titles["title_game_over_menu_text"], menu_static_titles["title_game_over_menu_rect"])
-        screen.blit(menu_static_titles["number_version_main_menu_text"], menu_static_titles["number_version_main_menu_rect"])
-
-        score_text = font_26.render(f"Score: {score}", True, (0, 0, 0))
-        score_rect = score_text.get_rect(center=(700, 310))
-        screen.blit(score_text, score_rect)
-
-        # Force elapsed_time to be an int
-        elapsed_seconds = int(elapsed_time)
-
-        # convert it to minutes and seconds
-        minutes = elapsed_seconds // 60
-        seconds = elapsed_seconds % 60
-
-        # display it
-        timer_text = font_26.render(f"Time: {minutes:02}m{seconds:02}s", True, BLACK)
-        timer_rect = timer_text.get_rect(center=(700, 440))
-        screen.blit(timer_text, timer_rect)
-
-        play_game_over_btn.draw(screen)
-        play_game_over_btn.handle_event(event)
-
-        back_to_menu_game_over_btn.draw(screen)
-        back_to_menu_game_over_btn.handle_event(event)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            play_game_over_btn.handle_event(event)
-            back_to_menu_game_over_btn.handle_event(event)
+        handle_game_over_menu(event)
 
 
     # refresh the screen
