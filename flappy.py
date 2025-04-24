@@ -6,6 +6,7 @@ import time
 pygame.init()
 
 from constants import *
+from utils import draw_mountains, draw_grass
 from assets import load_buttons, load_sounds_and_music, load_fonts, load_images
 from classes import Button, Pipe, Coin, Cloud
 from bird import bird_img, bird # bird.py
@@ -71,14 +72,6 @@ def check_coin_collision():
                 coin.scored = True
                 score += coin.value
                 sounds_and_music["coin_touched_sound"].play()
-
-
-def draw_mountains():
-    screen.blit(images["background_elements"]["mountain_img"], (0, HEIGHT - images["background_elements"]["mountain_img"].get_height()))
-
-
-def draw_grass():
-    screen.blit(images["background_elements"]["grass_img"], (0, HEIGHT - images["background_elements"]["grass_img"].get_height()))
 
 
 def countdown():
@@ -453,8 +446,8 @@ while running:
 
     # fill the screen with a color
     screen.fill(SKY_BLUE) # blue sky
-    draw_mountains()
-    draw_grass()
+    draw_mountains(screen)
+    draw_grass(screen)
 
     for cloud in clouds:
         cloud.move()
