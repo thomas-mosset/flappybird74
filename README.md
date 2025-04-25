@@ -26,7 +26,11 @@ Le jeu reprend le concept de Flappy bird. Le joueur ou la joueuse peut gagner de
 
 ## Démo (v1)
 
-[![Démo du jeu](https://markdown-videos-api.jorgenkh.no/youtube/B4nhvpC_mMQ)](https://youtu.be/B4nhvpC_mMQ)
+[![Démo du jeu (v1)](https://markdown-videos-api.jorgenkh.no/youtube/B4nhvpC_mMQ)](https://youtu.be/B4nhvpC_mMQ)
+
+## Démo (v2)
+
+[![Démo du jeu (v2)](https://markdown-videos-api.jorgenkh.no/youtube/Hz4l7dubO_0)](https://youtu.be/Hz4l7dubO_0)
 
 ## Lancer le jeu
 
